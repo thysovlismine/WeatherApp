@@ -7,7 +7,7 @@ using json = nlohmann::json;
 // Main Frame
 class MyFrame : public wxFrame {
 public:
-    MyFrame() : wxFrame(nullptr, wxID_ANY, "REST API Data Fetcher", wxDefaultPosition, wxSize(600, 400)) {
+    MyFrame() : wxFrame(nullptr, wxID_ANY, "REST API Data Fetcher 2", wxDefaultPosition, wxSize(600, 400)) {
         panel = new wxPanel(this);
         textCtrl = new wxTextCtrl(panel, wxID_ANY, "", wxPoint(10, 10), wxSize(560, 300), wxTE_MULTILINE | wxTE_READONLY);
         fetchButton = new wxButton(panel, wxID_ANY, "Fetch Data", wxPoint(10, 320), wxSize(100, 30));
