@@ -1,0 +1,7 @@
+
+Compilation (general):
+vcpkg integrate install     //returns you param where relay cmake file is.
+cmake .. -DCMAKE_TOOLCHAIN_FILE=$$PATH_TO_VCPKG.CMAKE$$ //and here you have to put it
+
+Compilation (windows):
+cmake .. -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
