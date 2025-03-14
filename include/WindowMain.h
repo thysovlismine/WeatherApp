@@ -8,6 +8,7 @@
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
 #include <thread>
+#include "Panel.h"
 
 wxDECLARE_EVENT(wxEVT_FETCH_COMPLETE, wxThreadEvent);
 

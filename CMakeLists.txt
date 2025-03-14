@@ -16,6 +16,7 @@ include_directories(include)
 add_executable(app WIN32 
     src/main.cpp
     src/WindowMain.cpp
+    src/Panel.cpp
 )
 
 # Link libraries
