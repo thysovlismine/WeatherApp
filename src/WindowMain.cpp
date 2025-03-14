@@ -7,8 +7,10 @@ WindowMain::WindowMain() : wxFrame(nullptr, wxID_ANY, "REST API Data Fetcher 2",
     // GUI Elements
     //panel = new wxPanel(this);
     
-    //set mainWindow
+    //set globals
     mainWindow = this;
+    mainSizer = new wxBoxSizer(wxVERTICAL);
+    SetSizer(mainSizer);
 
     //run Panel Start
     panel_start = new PanelStart();

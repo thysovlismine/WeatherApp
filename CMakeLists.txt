@@ -18,6 +18,7 @@ add_executable(app WIN32
     src/Panel.cpp
     src/WindowMain.cpp
     src/PanelStart.cpp
+    src/PanelAbout.cpp
 )
 
 # Link libraries

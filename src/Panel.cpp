@@ -6,8 +6,11 @@ Panel::Panel(Panel* origin){
     //hides a pervious panel (if this is not the main one)
     if(_origin != nullptr)
         _origin->panel->Hide();
-    //create this panel
+    //create this panel and show it
     panel = new wxPanel(mainWindow);
+    mainSizer->Add(panel, 1, wxEXPAND);
+    panel->Show();
+    mainWindow->Layout();  // Update layout
 }
 
 Panel::~Panel(){
@@ -15,10 +18,13 @@ Panel::~Panel(){
     
     //hide this panel and delete it
     panel->Hide();
-    delete panel;
+    panel->Destroy();
+    panel = nullptr;
     
     //show the previous panel (if this is not the main one)
-    if(_origin != nullptr) 
+    if(_origin != nullptr){
         _origin->panel->Show();
+        mainWindow->Layout();  // Update layout
+    }
 
 }

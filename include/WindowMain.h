@@ -11,6 +11,7 @@
 #include <thread>
 #include "Panel.h"
 #include "PanelStart.h"
+#include "PanelAbout.h"
 
 wxDECLARE_EVENT(wxEVT_FETCH_COMPLETE, wxThreadEvent);
 
@@ -21,7 +22,7 @@ class WindowMain : public wxFrame {
     WindowMain();
 
     //main panel
-    PanelStart* panel_start;
+    Panel* panel_start;
     
 };
 

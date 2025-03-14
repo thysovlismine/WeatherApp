@@ -2,6 +2,7 @@
 #include <wx/wx.h>
 
 extern wxWindow* mainWindow;
+extern wxBoxSizer* mainSizer;
 
 class Panel{
     public:

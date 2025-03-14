@@ -1,7 +1,9 @@
 // main.cpp
 #include "WindowMain.h"
 
+//globals
 wxWindow* mainWindow = nullptr;
+wxBoxSizer* mainSizer = nullptr;
 
 class MyApp : public wxApp {
 public:
