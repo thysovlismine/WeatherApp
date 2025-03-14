@@ -1,4 +1,7 @@
+#pragma once
 #include <wx/wx.h>
+
+extern wxWindow* mainWindow;
 
 class Panel{
     public:

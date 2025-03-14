@@ -3,70 +3,14 @@
 
 wxDEFINE_EVENT(wxEVT_FETCH_COMPLETE, wxThreadEvent);
 
-WindowMain::WindowMain() : wxFrame(nullptr, wxID_ANY, "REST API Data Fetcher 2", wxDefaultPosition, wxSize(600, 400)) {
+WindowMain::WindowMain() : wxFrame(nullptr, wxID_ANY, "REST API Data Fetcher 2", wxDefaultPosition, wxSize(640, 480)) {
     // GUI Elements
-    panel = new wxPanel(this);
-    //textCtrl = new wxTextCtrl(panel, wxID_ANY, "", wxPoint(10, 10), wxSize(560, 300), wxTE_MULTILINE | wxTE_READONLY);
-    //fetchButton = new wxButton(panel, wxID_ANY, "Fetch Data", wxPoint(10, 320), wxSize(100, 30));
-
-    // Events
-    //fetchButton->Bind(wxEVT_BUTTON, &WindowMain::OnFetchData, this);
-    //Bind(wxEVT_FETCH_COMPLETE, &WindowMain::OnFetchComplete, this);
-
-
-    listBox = new wxListBox(panel, wxID_ANY, wxPoint(10, 10), wxSize(250, 150));
-    listBox->Append("Item 1");
-    listBox->Append("Item 2");
-    listBox->Append("Item 3");
-    listBox->Append("Item 4");
-    listBox->Append("Item 3");
-    listBox->Append("Item 3");
-    listBox->Append("Item 3");
-    listBox->Append("Item 3");
-    listBox->Append("Item 3");
-    listBox->Append("Item 3");
-    listBox->Append("Item 3");
-    listBox->Append("Item 3");
-    listBox->Append("Item 3");
-    listBox->Append("Item 3");
-    listBox->Append("Item 3");
-    listBox->Append("Item 3");
-    listBox->Disable();
-    listBox->Bind(wxEVT_LISTBOX_DCLICK, &WindowMain::OnItemDoubleClicked, this);
-
-
+    //panel = new wxPanel(this);
     
+    //set mainWindow
+    mainWindow = this;
+
+    //run Panel Start
+    panel_start = new PanelStart();
 }
 
-
-void WindowMain::OnItemDoubleClicked(wxCommandEvent& event) {
-    int sel = listBox->GetSelection();
-    if (sel != wxNOT_FOUND) {
-        listBox->SetString(sel, "Selected!");
-    }
-}
-
-void WindowMain::OnFetchData(wxCommandEvent& event) {
-    // Run the fetch operation in a separate thread
-    std::thread(&WindowMain::FetchData, this).detach();
-}
-
-void WindowMain::FetchData() {
-    std::string url = "https://jsonplaceholder.typicode.com/posts/1";
-    cpr::Response r = cpr::Get(cpr::Url{url});
-
-    wxThreadEvent evt(wxEVT_FETCH_COMPLETE);
-    if (r.status_code == 200) {
-        json jsonData = json::parse(r.text);
-        std::string formattedData = "Title: " + jsonData["title"].get<std::string>() + "\n\n" +
-                                    "Body: " + jsonData["body"].get<std::string>();
-        evt.SetString(formattedData);
-    } else {
-        evt.SetString("Failed to fetch data. HTTP Status Code: " + std::to_string(r.status_code));
-    }
-    wxQueueEvent(this, evt.Clone());
-}
-
-void WindowMain::OnFetchComplete(wxThreadEvent& event) {
-    textCtrl->SetValue(event.GetString());
-}

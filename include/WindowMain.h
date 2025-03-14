@@ -1,4 +1,5 @@
 // WindowMain.h
+#pragma once
 #ifndef WINDOWMAIN_H
 #define WINDOWMAIN_H
 
@@ -9,33 +10,18 @@
 #include <nlohmann/json.hpp>
 #include <thread>
 #include "Panel.h"
+#include "PanelStart.h"
 
 wxDECLARE_EVENT(wxEVT_FETCH_COMPLETE, wxThreadEvent);
 
 using json = nlohmann::json;
 
 class WindowMain : public wxFrame {
-public:
+    public:
     WindowMain();
 
-private:
-    //panel
-    wxPanel* panel;
-    
-    //text
-    wxTextCtrl* textCtrl;
-
-    //button
-    wxButton* fetchButton;
-    void OnFetchData(wxCommandEvent& event);
-    void FetchData();
-    void OnFetchComplete(wxThreadEvent& event);
-
-    //listbox
-    wxListBox* listBox;
-    void OnItemDoubleClicked(wxCommandEvent& event);
-
-
+    //main panel
+    PanelStart* panel_start;
     
 };
 

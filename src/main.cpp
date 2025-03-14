@@ -1,6 +1,8 @@
 // main.cpp
 #include "WindowMain.h"
 
+wxWindow* mainWindow = nullptr;
+
 class MyApp : public wxApp {
 public:
     virtual bool OnInit() {

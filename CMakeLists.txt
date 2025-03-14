@@ -15,8 +15,9 @@ include_directories(include)
 # Add executable with WIN32 to avoid console window
 add_executable(app WIN32 
     src/main.cpp
-    src/WindowMain.cpp
     src/Panel.cpp
+    src/WindowMain.cpp
+    src/PanelStart.cpp
 )
 
 # Link libraries
