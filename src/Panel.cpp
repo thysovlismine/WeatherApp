@@ -17,14 +17,14 @@ Panel::~Panel(){
     //since this object is being deleted, the object that rely on it should be too.
     
     //hide this panel and delete it
+    mainSizer->Detach(panel);
     panel->Hide();
     panel->Destroy();
     panel = nullptr;
     
     //show the previous panel (if this is not the main one)
-    if(_origin != nullptr){
+    if(_origin != nullptr)
         _origin->panel->Show();
-        mainWindow->Layout();  // Update layout
-    }
-
+    
+    mainWindow->Layout();  // Update layout
 }

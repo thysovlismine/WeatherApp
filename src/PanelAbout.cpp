@@ -15,5 +15,8 @@ PanelAbout::~PanelAbout(){
 
 void PanelAbout::ButtonBack_OnButtonClick(wxCommandEvent& event){
     //open panel about
-    button_back->SetLabel("Clicked!");
+    //button_back->SetLabel("Clicked!");
+
+    //simply go back
+    delete this;
 }
