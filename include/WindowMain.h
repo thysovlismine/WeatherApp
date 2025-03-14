@@ -3,6 +3,7 @@
 #define WINDOWMAIN_H
 
 #include <wx/wx.h>
+#include <wx/listbox.h>
 #include <wx/thread.h>
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
@@ -17,13 +18,24 @@ public:
     WindowMain();
 
 private:
+    //panel
     wxPanel* panel;
+    
+    //text
     wxTextCtrl* textCtrl;
-    wxButton* fetchButton;
 
+    //button
+    wxButton* fetchButton;
     void OnFetchData(wxCommandEvent& event);
     void FetchData();
     void OnFetchComplete(wxThreadEvent& event);
+
+    //listbox
+    wxListBox* listBox;
+    void OnItemDoubleClicked(wxCommandEvent& event);
+
+
+    
 };
 
 #endif // WINDOWMAIN_H

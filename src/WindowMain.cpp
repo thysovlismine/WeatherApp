@@ -6,12 +6,44 @@ wxDEFINE_EVENT(wxEVT_FETCH_COMPLETE, wxThreadEvent);
 WindowMain::WindowMain() : wxFrame(nullptr, wxID_ANY, "REST API Data Fetcher 2", wxDefaultPosition, wxSize(600, 400)) {
     // GUI Elements
     panel = new wxPanel(this);
-    textCtrl = new wxTextCtrl(panel, wxID_ANY, "", wxPoint(10, 10), wxSize(560, 300), wxTE_MULTILINE | wxTE_READONLY);
-    fetchButton = new wxButton(panel, wxID_ANY, "Fetch Data", wxPoint(10, 320), wxSize(100, 30));
+    //textCtrl = new wxTextCtrl(panel, wxID_ANY, "", wxPoint(10, 10), wxSize(560, 300), wxTE_MULTILINE | wxTE_READONLY);
+    //fetchButton = new wxButton(panel, wxID_ANY, "Fetch Data", wxPoint(10, 320), wxSize(100, 30));
 
     // Events
-    fetchButton->Bind(wxEVT_BUTTON, &WindowMain::OnFetchData, this);
-    Bind(wxEVT_FETCH_COMPLETE, &WindowMain::OnFetchComplete, this);
+    //fetchButton->Bind(wxEVT_BUTTON, &WindowMain::OnFetchData, this);
+    //Bind(wxEVT_FETCH_COMPLETE, &WindowMain::OnFetchComplete, this);
+
+
+    listBox = new wxListBox(panel, wxID_ANY, wxPoint(10, 10), wxSize(250, 150));
+    listBox->Append("Item 1");
+    listBox->Append("Item 2");
+    listBox->Append("Item 3");
+    listBox->Append("Item 4");
+    listBox->Append("Item 3");
+    listBox->Append("Item 3");
+    listBox->Append("Item 3");
+    listBox->Append("Item 3");
+    listBox->Append("Item 3");
+    listBox->Append("Item 3");
+    listBox->Append("Item 3");
+    listBox->Append("Item 3");
+    listBox->Append("Item 3");
+    listBox->Append("Item 3");
+    listBox->Append("Item 3");
+    listBox->Append("Item 3");
+    listBox->Disable();
+    listBox->Bind(wxEVT_LISTBOX_DCLICK, &WindowMain::OnItemDoubleClicked, this);
+
+
+    
+}
+
+
+void WindowMain::OnItemDoubleClicked(wxCommandEvent& event) {
+    int sel = listBox->GetSelection();
+    if (sel != wxNOT_FOUND) {
+        listBox->SetString(sel, "Selected!");
+    }
 }
 
 void WindowMain::OnFetchData(wxCommandEvent& event) {
