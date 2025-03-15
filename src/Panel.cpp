@@ -1,7 +1,6 @@
 #include "Panel.h"
 
 Panel::Panel(Panel* origin){
-    std::cout << "33";
     //assigns and hides a pervious panel
     _origin = origin;
     //hides a pervious panel (if this is not the main one)

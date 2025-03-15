@@ -2,43 +2,41 @@
 
 wxDEFINE_EVENT(EVT_HTTP_FETCH_COMPLETE, wxThreadEvent);
 
+// Constructor
 HttpFetcher::HttpFetcher(wxEvtHandler* handler, const wxString& url)
-    : m_handler(handler), m_url(url), dead(false) {}
+    : m_handler(handler), m_url(url) {}
 
 void HttpFetcher::Fetch() {
-    // Run the fetch operation in a separate thread
+    //creates a separate thread
     std::thread(&HttpFetcher::FetchData, this).detach();
 }
 
 void HttpFetcher::Destroy(){
+    //mark as a thread to be killed
     dead = true;
-};
+}
 
-void HttpFetcher::FetchData() {
-    //check if panel is dead
-    if(dead){
-        wxMessageBox("bla, bla");
-        //do nothing and be forgotten
-        delete this;
-        return;
-    }
-
-    // Perform HTTP request using cpr
+void HttpFetcher::FetchData(){
+    //make sync call (takes some time)
     cpr::Response response = cpr::Get(cpr::Url{m_url.ToStdString()});
-    
-    // Create event
-    wxThreadEvent* event = new wxThreadEvent(EVT_HTTP_FETCH_COMPLETE);
 
-    // Check if request was successful
-    if (response.status_code == 200) {
-        event->SetPayload(response.text);
-    } else {
-        event->SetPayload("");  // Send empty string on failure
-    }
+    //send response back to the main thread (to be sure of order in execution)
+    wxTheApp->CallAfter([this, response]() {
+        //block and delete if dead
+        if(dead){
+            delete this;
+            return;
+        }
 
-    // Send data back to the main thread
-    wxQueueEvent(m_handler, event);
+        //Emit Event
+        auto event = new wxThreadEvent(EVT_HTTP_FETCH_COMPLETE);
+        if(response.status_code == 200)
+            event->SetPayload(response.text);
+        else 
+            event->SetPayload("");
+        wxQueueEvent(m_handler, event);
 
-    //delete this object
-    delete this;
+        //delete
+        delete this;
+    });
 }

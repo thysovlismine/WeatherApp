@@ -31,8 +31,7 @@ PanelStation::~PanelStation(){
     //Destroy HttpFetcher
     if(httpFetcher != nullptr){
         httpFetcher->Destroy();
-        httpFetcher->dead = true;
-        //httpFetcher = nullptr;
+        httpFetcher = nullptr;
     }
 }
 
@@ -60,7 +59,7 @@ void PanelStation::OnDataFetched(wxThreadEvent& event){
 
     //get response
     std::string response = event.GetPayload<std::string>();
-    wxMessageBox(response);
+
     //check error
     if(response.length() == 0){
         wxMessageBox("Failed to fetch data!", "Error", wxICON_ERROR | wxOK);

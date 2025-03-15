@@ -8,23 +8,21 @@
 #include <thread>
 #include <cpr/cpr.h>
 
-// Define custom event type for fetching completion
+//Define custom event type for fetching completion
 wxDECLARE_EVENT(EVT_HTTP_FETCH_COMPLETE, wxThreadEvent);
 
 class HttpFetcher {
     public:
     HttpFetcher(wxEvtHandler* handler, const wxString& url);
     void Fetch();
-
-    //Destroying
-    bool dead;
     void Destroy();
 
     private:
-    
     void FetchData();
+
     wxEvtHandler* m_handler;
     wxString m_url;
+    bool dead = false;
 };
 
 #endif // HTTPFETCHER_H
