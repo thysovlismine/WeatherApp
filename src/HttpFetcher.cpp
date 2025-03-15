@@ -26,4 +26,7 @@ void HttpFetcher::FetchData() {
 
     // Send data back to the main thread
     wxQueueEvent(m_handler, event);
+
+    //delete this object
+    delete this;
 }
