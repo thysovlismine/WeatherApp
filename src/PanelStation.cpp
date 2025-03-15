@@ -31,7 +31,8 @@ PanelStation::~PanelStation(){
     //Destroy HttpFetcher
     if(httpFetcher != nullptr){
         httpFetcher->Destroy();
-        httpFetcher = nullptr;
+        httpFetcher->dead = true;
+        //httpFetcher = nullptr;
     }
 }
 
@@ -79,7 +80,7 @@ void PanelStation::OnDataFetched(wxThreadEvent& event){
                 && item["param"].contains("paramName")
             ){
                 sensorIDs.Add(item["id"].get<int>());
-                //listSensors->Append(wxString::FromUTF8((item["param"]["paramName"]).get<std::string>()));
+                listSensors->Append(wxString::FromUTF8((item["param"]["paramName"]).get<std::string>()));
             }
     }
     catch(const std::exception&){
