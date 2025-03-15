@@ -3,7 +3,7 @@
 
 class PanelAbout : public Panel{
     public:
-    PanelAbout(Panel* origin);
+    PanelAbout(Panel* origin, wxString text);
     ~PanelAbout();
 
     //Button Back

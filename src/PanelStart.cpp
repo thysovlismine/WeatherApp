@@ -76,16 +76,16 @@ void PanelStart::OnDataFetched(wxThreadEvent& event){
 }
 
 void PanelStart::ListStations_OnItemDoubleClicked(wxCommandEvent& event){
-    int sel = listStations->GetSelection();
-    if (sel != wxNOT_FOUND) {
-        listStations->SetString(sel, "Double Clicked!");
+    int index = listStations->GetSelection();
+    if (index != wxNOT_FOUND) {
+        new PanelAbout(this, listStations->GetString(index));
     }
 }
 
 
 void PanelStart::ButtonAbout_OnButtonClick(wxCommandEvent& event){
     //open panel about
-    new PanelAbout(this);
+    //new PanelAbout(this);
     button_about->SetLabel("Clicked!");
 
 }
