@@ -1,6 +1,8 @@
 #include "PanelStart.h"
 #include "HttpFetcher.h"
 
+//================================================================
+
 PanelStart::PanelStart() : Panel(nullptr){
     
     //Text top
@@ -31,6 +33,7 @@ PanelStart::~PanelStart(){
     button_about->Destroy(); button_about = nullptr;
 }
 
+//================================================================
 
 void PanelStart::FetchList(){
     //disalbe ListStations
@@ -75,6 +78,8 @@ void PanelStart::OnDataFetched(wxThreadEvent& event){
     }
 }
 
+//================================================================
+
 void PanelStart::ListStations_OnItemDoubleClicked(wxCommandEvent& event){
     int index = listStations->GetSelection();
     if (index != wxNOT_FOUND) {
@@ -82,6 +87,7 @@ void PanelStart::ListStations_OnItemDoubleClicked(wxCommandEvent& event){
     }
 }
 
+//================================================================
 
 void PanelStart::ButtonAbout_OnButtonClick(wxCommandEvent& event){
     //open panel about
