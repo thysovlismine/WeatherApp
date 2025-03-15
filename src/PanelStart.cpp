@@ -1,5 +1,4 @@
 #include "PanelStart.h"
-#include "HttpFetcher.h"
 
 //================================================================
 
@@ -83,7 +82,7 @@ void PanelStart::OnDataFetched(wxThreadEvent& event){
 void PanelStart::ListStations_OnItemDoubleClicked(wxCommandEvent& event){
     int index = listStations->GetSelection();
     if (index != wxNOT_FOUND) {
-        new PanelAbout(this, listStations->GetString(index));
+        new PanelStation(this, index);
     }
 }
 
