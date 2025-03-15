@@ -2,6 +2,7 @@
 #ifndef HTTPFETCHER_H
 #define HTTPFETCHER_H
 
+#include <wx/wx.h>
 #include <wx/event.h>
 #include <wx/string.h>
 #include <thread>
@@ -11,11 +12,16 @@
 wxDECLARE_EVENT(EVT_HTTP_FETCH_COMPLETE, wxThreadEvent);
 
 class HttpFetcher {
-public:
+    public:
     HttpFetcher(wxEvtHandler* handler, const wxString& url);
     void Fetch();
 
-private:
+    //Destroying
+    bool dead;
+    void Destroy();
+
+    private:
+    
     void FetchData();
     wxEvtHandler* m_handler;
     wxString m_url;

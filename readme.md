@@ -4,6 +4,11 @@
 - `WindowMain` - Wybór stacji Pomiarowej.
 - `?` - Odczyt parametru danej stacji pomiarowej.
 
+# Noticed Errors:
+
+- There is a problem when you make a fetch to a wrongly written url
+- Response from HttpFetcher given to an already destroyed object(wxPanel) closes the app
+
 # Plan DB
 
 ```

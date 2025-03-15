@@ -13,6 +13,7 @@ class PanelStation : public Panel{
     
     //funcs
     void FetchParams();
+    HttpFetcher* httpFetcher;
     void OnDataFetched(wxThreadEvent& event);
 
     //Text top

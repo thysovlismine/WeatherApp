@@ -2,7 +2,7 @@
 
 //================================================================
 
-PanelStart::PanelStart() : Panel(nullptr){
+PanelStart::PanelStart() : Panel(nullptr), httpFetcher(nullptr){
     //Text top
     textTop = new wxStaticText(panel, wxID_ANY, "Wybierz Stacje Pomiarowa", wxPoint(10, 10));
 
@@ -24,20 +24,32 @@ PanelStart::~PanelStart(){
     textTop->Destroy(); textTop = nullptr;
     listStations->Destroy(); listStations = nullptr;
     button_about->Destroy(); button_about = nullptr;
+    //Destroy HttpFetcher
+    if(httpFetcher != nullptr){
+        httpFetcher->Destroy();
+        httpFetcher = nullptr;
+    }
 }
 
 //================================================================
 
 void PanelStart::FetchList(){
+    //block if already called
+    if(httpFetcher != nullptr)
+        return;
+
     //disalbe ListStations
     listStations->Disable();
 
     //fetch data
-    HttpFetcher* fetcher = new HttpFetcher(panel, "https://api.gios.gov.pl/pjp-api/rest/station/findAll");
-    fetcher->Fetch();
+    httpFetcher = new HttpFetcher(panel, "https://api.gios.gov.pl/pjp-api/rest/station/findAll");
+    httpFetcher->Fetch();
 }
 
 void PanelStart::OnDataFetched(wxThreadEvent& event){
+    //unlock FetchList function
+    httpFetcher = nullptr;
+
     //enable ListStations
     listStations->Enable();
     

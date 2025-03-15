@@ -3,7 +3,7 @@
 
 //================================================================
 
-PanelStation::PanelStation(Panel* origin, int _stationId) : Panel(origin){
+PanelStation::PanelStation(Panel* origin, int _stationId) : Panel(origin), httpFetcher(nullptr){
     //context
     stationId = _stationId;
 
@@ -28,21 +28,32 @@ PanelStation::~PanelStation(){
     textTop->Destroy(); textTop = nullptr;
     listSensors->Destroy(); listSensors = nullptr;
     button_back->Destroy(); button_back = nullptr;
+    //Destroy HttpFetcher
+    if(httpFetcher != nullptr){
+        httpFetcher->Destroy();
+        httpFetcher = nullptr;
+    }
 }
 
 //================================================================
 
 void PanelStation::FetchParams(){
+    //block if already called
+    if(httpFetcher != nullptr)
+        return;
+    
     //disalbe ListStations
     listSensors->Disable();
 
     //fetch data
-    HttpFetcher* fetcher = new HttpFetcher(panel, "https://api.gios.gov.pl/pjp-api/rest/station/sensors/" + stationId);
-    fetcher->Fetch();
+    httpFetcher = new HttpFetcher(panel, "https://api.gios.gov.pl/pjp-api/rest/station/sensors/" + std::to_string(stationId));
+    httpFetcher->Fetch();
 }
 
 void PanelStation::OnDataFetched(wxThreadEvent& event){
-    return;
+    //unlock FetchParams function
+    httpFetcher = nullptr;
+
     //enable ListSensors
     listSensors->Enable();
 
