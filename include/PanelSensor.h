@@ -1,19 +1,18 @@
 #pragma once
 #include "Panel.h"
-#include "PanelSensor.h"
 #include "HttpFetcher.h"
 #include <nlohmann/json.hpp>
 
-class PanelStation : public Panel{
+class PanelSensor : public Panel{
     public:
-    PanelStation(Panel* origin, int stationId);
-    ~PanelStation();
+    PanelSensor(Panel* origin, int sensorId);
+    ~PanelSensor();
 
     //context
-    int stationId;
+    int sensorId;
     
     //funcs
-    void FetchParams();
+    void FetchData();
     HttpFetcher* httpFetcher = nullptr;
     void OnDataFetched(wxThreadEvent& event);
 
@@ -21,9 +20,7 @@ class PanelStation : public Panel{
     wxStaticText* textTop;
 
     //List
-    wxListBox* listSensors;
-    wxArrayInt sensorIDs;   //database of sensor ids
-    void ListSensors_OnItemDoubleClicked(wxCommandEvent& event);
+    wxListBox* list;
 
     //Button Back
     wxButton* button_back;

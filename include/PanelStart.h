@@ -12,7 +12,7 @@ class PanelStart : public Panel{
 
     //funcs
     void FetchList();
-    HttpFetcher* httpFetcher;
+    HttpFetcher* httpFetcher = nullptr;
     void OnDataFetched(wxThreadEvent& event);
 
     //Text top

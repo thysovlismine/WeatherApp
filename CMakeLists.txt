@@ -20,6 +20,7 @@ add_executable(app WIN32
     src/HttpFetcher.cpp
     src/PanelStart.cpp
     src/PanelStation.cpp
+    src/PanelSensor.cpp
     src/PanelAbout.cpp
 )
 

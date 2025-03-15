@@ -1,9 +1,8 @@
 #include "PanelStation.h"
-#include "HttpFetcher.h"
 
 //================================================================
 
-PanelStation::PanelStation(Panel* origin, int _stationId) : Panel(origin), httpFetcher(nullptr){
+PanelStation::PanelStation(Panel* origin, int _stationId) : Panel(origin){
     //context
     stationId = _stationId;
 
@@ -93,7 +92,7 @@ void PanelStation::OnDataFetched(wxThreadEvent& event){
 void PanelStation::ListSensors_OnItemDoubleClicked(wxCommandEvent& event){
     int index = listSensors->GetSelection();
     if (index != wxNOT_FOUND) {
-        ;
+        new PanelSensor(this, sensorIDs[index]);
     }
 }
 
