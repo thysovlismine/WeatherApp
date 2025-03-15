@@ -1,14 +1,23 @@
 #pragma once
 #include "Panel.h"
 #include "PanelAbout.h"
+#include <nlohmann/json.hpp>
 
 class PanelStart : public Panel{
     public:
     PanelStart();
     ~PanelStart();
 
-    //Elements
-    wxListBox* listBox;
+    //funcs
+    void FetchList();
+    void OnDataFetched(wxThreadEvent& event);
+
+    //Text top
+    wxStaticText* textTop;
+
+    //List
+    wxListBox* listStations;
+    void ListStations_OnItemDoubleClicked(wxCommandEvent& event);
 
     //Button About
     wxButton* button_about;

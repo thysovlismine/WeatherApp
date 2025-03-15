@@ -17,6 +17,7 @@ add_executable(app WIN32
     src/main.cpp
     src/Panel.cpp
     src/WindowMain.cpp
+    src/HttpFetcher.cpp
     src/PanelStart.cpp
     src/PanelAbout.cpp
 )
