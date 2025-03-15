@@ -7,7 +7,11 @@
 # Noticed Errors:
 
 - There is a problem when you make a fetch to a wrongly written url
-- Response from HttpFetcher given to an already destroyed object(wxPanel) closes the app
+
+# Strategy / Approach
+
+- `HttpRequest` should be called by a `Panel` and not by the DBMS. To be clear, DBMS could acctually handle every async thing, but then would come a question of when to update things. So let a `Panel` be the initiator which recieves the response from the server, and gives it to the DBMS to parse it and include in its DB. 
+
 
 # Plan DB
 
