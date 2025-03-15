@@ -4,7 +4,19 @@
 - `WindowMain` - Wybór stacji Pomiarowej.
 - `?` - Odczyt parametru danej stacji pomiarowej.
 
+# Plan DB
 
+```
+DB structure:
+
+----DB
+    |
+    |---index.json                  //Info o stacjach
+    |
+    |---station_$stationId$.json    //Info o sensorach danej stacji
+    |
+    |---sensor_$stationId$.json     //Dane dotyczące danego sensora, danej konkretnej stacji (stationId is unikatowy)
+```
 
 # Plan Działania
 
