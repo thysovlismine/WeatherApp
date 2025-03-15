@@ -3,18 +3,12 @@
 //================================================================
 
 PanelStart::PanelStart() : Panel(nullptr){
-    
     //Text top
     textTop = new wxStaticText(panel, wxID_ANY, "Wybierz Stacje Pomiarowa", wxPoint(10, 10));
 
     //List Stations
     listStations = new wxListBox(panel, wxID_ANY, wxPoint(10, 30), wxSize(400, 250));
     listStations->Bind(wxEVT_LISTBOX_DCLICK, &PanelStart::ListStations_OnItemDoubleClicked, this);
-    listStations->Append("Item 1");
-    listStations->Append("Item 2");
-    listStations->Append("Item 3");
-    listStations->Append("Item 4");
-    //listStations->Disable();
 
     //Button About
     //button_about = new wxButton(panel, wxID_ANY, "Click Me", wxPoint(100, 250), wxSize(100, 40));
@@ -39,7 +33,6 @@ void PanelStart::FetchList(){
     listStations->Disable();
 
     //fetch data
-    //HttpFetcher* fetcher = new HttpFetcher(panel, "https://jsonplaceholder.typicode.com/posts");
     HttpFetcher* fetcher = new HttpFetcher(panel, "https://api.gios.gov.pl/pjp-api/rest/station/findAll");
     fetcher->Fetch();
 }
@@ -61,15 +54,17 @@ void PanelStart::OnDataFetched(wxThreadEvent& event){
     try{
         nlohmann::json responseJSON = nlohmann::json::parse(response);
         
-        //get names
-        wxArrayString titles;
-        for (const auto& item : responseJSON) 
-            if (item.contains("stationName")) 
-                titles.Add(wxString::FromUTF8(item["stationName"].get<std::string>()));
-        
-        //apply new names
+        //add items
+        stationIDs.Clear();
         listStations->Clear();
-        listStations->InsertItems(titles, 0);
+        for (const auto& item : responseJSON)
+            if (
+                item.contains("id")
+                && item.contains("stationName")
+            ){
+                stationIDs.Add(item["id"].get<int>());
+                listStations->Append(wxString::FromUTF8(item["stationName"].get<std::string>()));
+            }
     }
     catch(const std::exception&){
         //log
@@ -82,7 +77,7 @@ void PanelStart::OnDataFetched(wxThreadEvent& event){
 void PanelStart::ListStations_OnItemDoubleClicked(wxCommandEvent& event){
     int index = listStations->GetSelection();
     if (index != wxNOT_FOUND) {
-        new PanelStation(this, index);
+        new PanelStation(this, stationIDs[index]);
     }
 }
 

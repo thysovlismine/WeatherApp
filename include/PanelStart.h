@@ -16,9 +16,10 @@ class PanelStart : public Panel{
 
     //Text top
     wxStaticText* textTop;
-
+    
     //List
     wxListBox* listStations;
+    wxArrayInt stationIDs;  //database of station ids
     void ListStations_OnItemDoubleClicked(wxCommandEvent& event);
 
     //Button About

@@ -1,5 +1,6 @@
 #pragma once
 #include <wx/wx.h>
+#include <iostream>
 
 extern wxWindow* mainWindow;
 extern wxBoxSizer* mainSizer;
