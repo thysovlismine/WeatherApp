@@ -37,42 +37,42 @@ void PanelStart::FetchList(){
     listStations->Disable();
 
     //fetch data
-    HttpFetcher* fetcher = new HttpFetcher(panel, "https://jsonplaceholder.typicode.com/posts");
+    //HttpFetcher* fetcher = new HttpFetcher(panel, "https://jsonplaceholder.typicode.com/posts");
+    HttpFetcher* fetcher = new HttpFetcher(panel, "https://api.gios.gov.pl/pjp-api/rest/station/findAll");
     fetcher->Fetch();
 }
 
 void PanelStart::OnDataFetched(wxThreadEvent& event){
-    wxString jsonString = event.GetPayload<wxString>();
-
-    if (jsonString.IsEmpty()) {
-        wxMessageBox("Failed to fetch data!", "Error", wxICON_ERROR | wxOK);
-        //enable ListStations
-        listStations->Enable();
-        return;
-    }
-
-    // Parse JSON using nlohmann::json
-    wxArrayString titles;
-    try {
-        nlohmann::json jsonResponse = nlohmann::json::parse(jsonString.ToStdString());
-
-        for (const auto& item : jsonResponse) {
-            if (item.contains("title")) {
-                titles.Add(wxString::FromUTF8(item["title"].get<std::string>()));
-            }
-        }
-    } catch (const std::exception&) {
-        wxMessageBox("Failed to parse JSON!", "Error", wxICON_ERROR | wxOK);
-        //enable ListStations
-        listStations->Enable();
-        return;
-    }
-
-    listStations->Clear();
-    listStations->InsertItems(titles, 0);
-
     //enable ListStations
     listStations->Enable();
+    
+    //get response
+    std::string response = event.GetPayload<std::string>();
+
+    //check error
+    if(response.length() == 0){
+        wxMessageBox("Failed to fetch data!", "Error", wxICON_ERROR | wxOK);
+        return;
+    }
+
+    //parse json
+    try{
+        nlohmann::json responseJSON = nlohmann::json::parse(response);
+        
+        //get names
+        wxArrayString titles;
+        for (const auto& item : responseJSON) 
+            if (item.contains("stationName")) 
+                titles.Add(wxString::FromUTF8(item["stationName"].get<std::string>()));
+        
+        //apply new names
+        listStations->Clear();
+        listStations->InsertItems(titles, 0);
+    }
+    catch(const std::exception&){
+        //log
+        wxMessageBox("Failed to parse JSON!", "Error", wxICON_ERROR | wxOK);
+    }
 }
 
 void PanelStart::ListStations_OnItemDoubleClicked(wxCommandEvent& event){
