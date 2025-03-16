@@ -9,9 +9,42 @@ PanelSensor::PanelSensor(Panel* origin, int _sensorId) : Panel(origin){
     //List Sensors
     list = new wxListBox(panel, wxID_ANY, wxPoint(410, 30), wxSize(400, 250));
     
-    //chart
-	//chart = new wxLineChartCtrl(panel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, wxPoint(10, 30), wxSize(400, 250), wxBORDER_NONE);
+    
 
+    // Create the data for the line chart widget
+	wxVector<wxString> labels;
+	labels.push_back("January");
+	labels.push_back("February");
+	labels.push_back("March");
+	labels.push_back("April");
+	labels.push_back("May");
+	labels.push_back("June");
+
+	labels.push_back("July1");
+    labels.push_back("July2");
+    labels.push_back("July3");
+    labels.push_back("July4");
+    wxChartsCategoricalData::ptr chartData = wxChartsCategoricalData::make_shared(labels);
+    
+	// Add the first dataset
+	wxVector<wxDouble> points1;
+	points1.push_back(3);
+	points1.push_back(-2.5);
+	points1.push_back(-1.2);
+	points1.push_back(3);
+	points1.push_back(6);
+	points1.push_back(5);
+
+    points1.push_back(1);
+    points1.push_back(2);
+    points1.push_back(3);
+    points1.push_back(4);
+    wxChartsDoubleDataset::ptr dataset1(new wxChartsDoubleDataset("My First Dataset", points1));
+	chartData->AddDataset(dataset1);
+
+    //chart
+	chart = new wxLineChartCtrl(panel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, wxPoint(10, 30), wxSize(400, 250), wxBORDER_NONE);
+    
     // Create the legend widget (optional)
 	//wxChartsLegendData legendData(chartData->GetDatasets());
 	//wxChartsLegendCtrl* legendCtrl = new wxChartsLegendCtrl(panel, wxID_ANY, legendData, wxPoint(0, 0), wxSize(100, 100), wxBORDER_NONE);
@@ -68,7 +101,6 @@ void PanelSensor::OnDataFetched(wxThreadEvent& event){
 
     //get response
     std::string response = event.GetPayload<std::string>();
-    wxMessageBox(response);
 
     //parse json
     try{
@@ -86,15 +118,17 @@ void PanelSensor::OnDataFetched(wxThreadEvent& event){
         //wxChartData seriesData;
         wxVector<wxString> labels;
         wxVector<wxDouble> points;
+        int i = 0;
         if(responseJSON.contains("values")){
-            wxMessageBox("yes");
             for (const auto& item : responseJSON["values"]){
                 if (item.contains("date")
                     && item.contains("value")
                 ){
                     list->Append(wxString::FromUTF8( std::to_string((item["value"]).get<float>())));
-                    labels.push_back(item["date"].get<std::string>());
-                    points.push_back(item["value"].get<float>());
+                    //labels.push_back(item["date"].get<std::string>());
+                    labels.push_back(std::to_string(i++));
+                    points.push_back(i);
+                    //points.push_back(item["value"].get<float>());
                     //list->Append("gag");
                 }
                 else{
@@ -103,12 +137,13 @@ void PanelSensor::OnDataFetched(wxThreadEvent& event){
             }
         }
         
-        
+        return;
         //labels
         wxChartsCategoricalData::ptr chartData = wxChartsCategoricalData::make_shared(labels);
         
         //points
         wxChartsDoubleDataset::ptr chartDataSet(new wxChartsDoubleDataset("My First Dataset", points));
+
         chartData->AddDataset(chartDataSet);
 
         // Create the line chart widget from the constructed data

@@ -7,6 +7,7 @@
 # Noticed Errors:
 
 - There is a problem when you make a fetch to a wrongly written url
+- LineChart seem to also allow to see values in the points that are between values or weirdly around... leading to a unreadable chart when mouse hovers on it.
 
 # Strategy / Approach
 
