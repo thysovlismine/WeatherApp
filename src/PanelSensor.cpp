@@ -51,23 +51,23 @@ PanelSensor::PanelSensor(Panel* origin, int _sensorId) : Panel(origin){
     // Create the line chart widget from the constructed data
 	wxLineChartCtrl* lineChartCtrl = new wxLineChartCtrl(panel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, wxPoint(10, 30), wxSize(400, 250), wxBORDER_NONE);
 
-    // Create the legend widget
-	wxChartsLegendData legendData(chartData->GetDatasets());
-	wxChartsLegendCtrl* legendCtrl = new wxChartsLegendCtrl(panel, wxID_ANY, legendData, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+    // Create the legend widget (optional)
+	//wxChartsLegendData legendData(chartData->GetDatasets());
+	//wxChartsLegendCtrl* legendCtrl = new wxChartsLegendCtrl(panel, wxID_ANY, legendData, wxPoint(0, 0), wxSize(100, 100), wxBORDER_NONE);
 
     // Set up the sizer for the panel
-	wxBoxSizer* panelSizer = new wxBoxSizer(wxHORIZONTAL);
-	panelSizer->Add(lineChartCtrl, 1, wxEXPAND);
-	panelSizer->Add(legendCtrl, 1, wxEXPAND);
-	panel->SetSizer(panelSizer);
+	//wxBoxSizer* panelSizer = new wxBoxSizer(wxHORIZONTAL);
+	//panelSizer->Add(lineChartCtrl, 1, wxEXPAND);
+	//panelSizer->Add(legendCtrl, 1, wxEXPAND);
+	//panel->SetSizer(panelSizer);
 
 
 
 
 
     //Button Back
-    //button_back = new wxButton(panel, wxID_ANY, "<--", wxPoint(10, 300), wxSize(100, 40));
-    //button_back->Bind(wxEVT_BUTTON, &PanelSensor::ButtonBack_OnButtonClick, this);
+    button_back = new wxButton(panel, wxID_ANY, "<--", wxPoint(10, 300), wxSize(100, 40));
+    button_back->Bind(wxEVT_BUTTON, &PanelSensor::ButtonBack_OnButtonClick, this);
 
     //fetch data
     //panel->Bind(EVT_HTTP_FETCH_COMPLETE, &PanelSensor::OnDataFetched, this);
