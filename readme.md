@@ -8,6 +8,7 @@
 
 - There is a problem when you make a fetch to a wrongly written url
 - LineChart seem to also allow to see values in the points that are between values or weirdly around... leading to a unreadable chart when mouse hovers on it.
+- JSON values should be parsed via a try/catch method cause reading an int for example from a null value will cause an error (thus may stop a part of a code or a whole).
 
 # Strategy / Approach
 
