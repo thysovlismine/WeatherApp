@@ -7,6 +7,9 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(wxWidgets REQUIRED)
 find_package(cpr CONFIG REQUIRED)
 
+# Find wxCharts (installed via vcpkg)
+find_package(wxcharts REQUIRED)
+
 # Setup wxWidgets
 include(${wxWidgets_USE_FILE})
 
@@ -25,4 +28,8 @@ add_executable(app WIN32
 )
 
 # Link libraries
-target_link_libraries(app PRIVATE cpr::cpr ${wxWidgets_LIBRARIES})
+target_link_libraries(app PRIVATE 
+    cpr::cpr 
+    ${wxWidgets_LIBRARIES}
+    wxcharts::wxcharts
+)
