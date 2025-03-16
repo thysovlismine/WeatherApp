@@ -21,6 +21,9 @@ class PanelSensor : public Panel{
     //Text top
     wxStaticText* textTop;
 
+    //chart
+    wxLineChartCtrl* chart = nullptr;
+
     //List
     wxListBox* list;
 
