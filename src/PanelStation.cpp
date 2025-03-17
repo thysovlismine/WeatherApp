@@ -66,27 +66,19 @@ void PanelStation::OnDataFetched(wxThreadEvent& event){
         wxMessageBox("Failed to fetch data!", "Error", wxICON_ERROR | wxOK);
         return;
     }
+    else{
+        //update DB
+        LocalDB::UpdateStation(stationId, response);
+    }
+
+    //get data from the DB
+    data = LocalDB::LoadStation(stationId);
+    size_t count = data.size();
     
-    //parse json
-    try{
-        nlohmann::json responseJSON = nlohmann::json::parse(response);
-        
-        //add items
-        sensorIDs.Clear();
-        listSensors->Clear();
-        for (const auto& item : responseJSON)
-            if (item.contains("id")
-                && item.contains("param")
-                && item["param"].contains("paramName")
-            ){
-                sensorIDs.Add(item["id"].get<int>());
-                listSensors->Append(wxString::FromUTF8((item["param"]["paramName"]).get<std::string>()));
-            }
-    }
-    catch(const std::exception&){
-        //log
-        wxMessageBox("Failed to parse JSON!", "Error", wxICON_ERROR | wxOK);
-    }
+    //add items
+    listSensors->Clear();
+    for(size_t i = 0; i < count; i++)
+        listSensors->Append(wxString::FromUTF8(data[i].name));
 }
 
 //================================================================
@@ -94,7 +86,7 @@ void PanelStation::OnDataFetched(wxThreadEvent& event){
 void PanelStation::ListSensors_OnItemDoubleClicked(wxCommandEvent& event){
     int index = listSensors->GetSelection();
     if (index != wxNOT_FOUND) {
-        new PanelSensor(this, sensorIDs[index]);
+        new PanelSensor(this, data[index].id);
     }
 }
 

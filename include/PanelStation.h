@@ -1,6 +1,7 @@
 #pragma once
 #include "Panel.h"
 #include "HttpFetcher.h"
+#include "LocalDB.h"
 
 class PanelStation : public Panel{
     public:
@@ -19,8 +20,8 @@ class PanelStation : public Panel{
     wxStaticText* textTop;
 
     //List
+    std::vector<SensorIndexInfo> data;
     wxListBox* listSensors;
-    wxArrayInt sensorIDs;   //database of sensor ids
     void ListSensors_OnItemDoubleClicked(wxCommandEvent& event);
 
     //Button Back

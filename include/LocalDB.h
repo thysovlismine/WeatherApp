@@ -15,12 +15,12 @@ struct StationIndexInfo{
 
 struct SensorIndexInfo{
     std::string id;
-    wxString name;
+    std::string name;
 };
 
 struct SensorData{
     float value;
-    wxString date;
+    std::string date;
 };
 
 class SensorDataset{

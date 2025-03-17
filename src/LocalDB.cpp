@@ -6,7 +6,7 @@
 SensorDataset::SensorDataset(){}
 SensorDataset::~SensorDataset(){}
 
-void LocalDB::UpdateIndex(std::string data){
+void UpdateGeneral(std::string data, std::string targetFile, std::string uniqueKeyName){
     //parse json
     nlohmann::json fetched;
     nlohmann::json present;
@@ -17,7 +17,7 @@ void LocalDB::UpdateIndex(std::string data){
         fetched = nlohmann::json::parse(data);
         
         //load file
-        std::ifstream inFile("index.json");
+        std::ifstream inFile(targetFile);
         if(inFile){
             //parse json
             inFile >> present;  // Deserialize JSON data
@@ -27,7 +27,7 @@ void LocalDB::UpdateIndex(std::string data){
             //just make an empty array
             //present = nlohmann::json::array();
             //or skip processing part and save fetched to index.json
-            std::ofstream outFile("index.json");
+            std::ofstream outFile(targetFile);
             outFile << fetched.dump(4);
             outFile.close();
             return;
@@ -35,7 +35,7 @@ void LocalDB::UpdateIndex(std::string data){
     }
     catch(const std::exception&){
         //error
-        wxMessageBox("Error on UpdateIndex!!!!");
+        wxMessageBox("Error on UpdateGeneral!!!!");
         return;
     }
 
@@ -45,7 +45,7 @@ void LocalDB::UpdateIndex(std::string data){
         //scan fetched array
         for (const auto& item : fetched) {
             //find index of a present item with the same id
-            i = JSON_Find(item["id"], "id", present);
+            i = JSON_Find(item[uniqueKeyName], uniqueKeyName, present);
             if(i){
                 //update data of this item
                 present[--i] = item;
@@ -57,24 +57,28 @@ void LocalDB::UpdateIndex(std::string data){
     }
     catch(const std::exception&){
         //error
-        wxMessageBox("Error on UpdateIndex at processing part!!!!");
+        wxMessageBox("Error on UpdateGeneral at processing part!!!!");
     }
     
     //save the updated json
     try{
         //save present to file
-        std::ofstream outFile("index.json");
+        std::ofstream outFile(targetFile);
         outFile << present.dump(4);
         outFile.close();
     }
     catch(const std::exception&){
         //error
-        wxMessageBox("Error on UpdateIndex at saving part!!!!");
+        wxMessageBox("Error on UpdateGeneral at saving part!!!!");
     }
 }
 
-void LocalDB::UpdateStation(std::string stationId, std::string data){
+void LocalDB::UpdateIndex(std::string data){
+    UpdateGeneral(data, "index.json", "id");
+}
 
+void LocalDB::UpdateStation(std::string stationId, std::string data){
+    UpdateGeneral(data, "station_" + stationId + ".json", "id");
 }
 
 void LocalDB::UpdateSensor(std::string sensorId, std::string data){
@@ -114,8 +118,12 @@ std::vector<StationIndexInfo> LocalDB::LoadIndex(){
     //write data
     std::vector<StationIndexInfo> data(count);
     while(count--){
-        data[count].id = JSON_ParseAsString(present[count]["id"]);            
-        data[count].name = JSON_ParseString(present[count]["stationName"]);
+        //check required fields
+        if(present[count].contains("id") && present[count].contains("stationName")){
+            //keep data
+            data[count].id = JSON_ParseAsString(present[count]["id"]);            
+            data[count].name = JSON_ParseString(present[count]["stationName"]);
+        }
     }
 
     //return
@@ -123,7 +131,49 @@ std::vector<StationIndexInfo> LocalDB::LoadIndex(){
 }
 
 std::vector<SensorIndexInfo> LocalDB::LoadStation(std::string stationId){
-    return std::vector<SensorIndexInfo>();
+    //load json
+    nlohmann::json present;
+
+    //prepare json
+    try{
+        //load file
+        std::ifstream inFile("station_" + stationId + ".json");
+        if(inFile){
+            //parse json
+            inFile >> present;  // Deserialize JSON data
+            inFile.close();
+        }
+        else{
+            //error
+            wxMessageBox("Error on LoadStation (File doesn't exist)!!!!");
+            return std::vector<SensorIndexInfo>();
+        }
+    }
+    catch(const std::exception&){
+        //error
+        wxMessageBox("Error on LoadStation!!!!");
+        return std::vector<SensorIndexInfo>();
+    }
+
+    //check count
+    size_t count = present.size();
+    if(count <= 0)
+        return std::vector<SensorIndexInfo>();
+    
+    //write data
+    std::vector<SensorIndexInfo> data(count);
+    while(count--){
+        //check requierd fields
+        if(present[count].contains("id") && present[count].contains("param"))
+            if(present[count]["param"].contains("paramName")){
+                //add
+                data[count].id = JSON_ParseAsString(present[count]["id"]);            
+                data[count].name = JSON_ParseString(present[count]["param"]["paramName"]);
+            }
+    }
+
+    //return
+    return data;
 }
 
 std::vector<SensorDataset> LocalDB::LoadSensor(std::string sensorId){

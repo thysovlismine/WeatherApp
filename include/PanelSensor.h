@@ -6,11 +6,11 @@
 
 class PanelSensor : public Panel{
     public:
-    PanelSensor(Panel* origin, int sensorId);
+    PanelSensor(Panel* origin, std::string sensorId);
     ~PanelSensor();
 
     //context
-    int sensorId;
+    std::string sensorId;
     
     //funcs
     void FetchData();

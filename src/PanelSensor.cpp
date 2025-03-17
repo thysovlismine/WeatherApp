@@ -5,7 +5,7 @@
 
 //================================================================
 
-PanelSensor::PanelSensor(Panel* origin, int _sensorId) : Panel(origin){
+PanelSensor::PanelSensor(Panel* origin, std::string _sensorId) : Panel(origin){
     //context
     sensorId = _sensorId;
 
@@ -96,7 +96,7 @@ void PanelSensor::FetchData(){
         return;
 
     //fetch data
-    httpFetcher = new HttpFetcher(panel, "https://api.gios.gov.pl/pjp-api/rest/data/getData/" + std::to_string(sensorId));
+    httpFetcher = new HttpFetcher(panel, "https://api.gios.gov.pl/pjp-api/rest/data/getData/" + sensorId);
     httpFetcher->Fetch();
 }
 
