@@ -4,11 +4,11 @@
 
 class PanelStation : public Panel{
     public:
-    PanelStation(Panel* origin, int stationId);
+    PanelStation(Panel* origin, std::string stationId);
     ~PanelStation();
 
     //context
-    int stationId;
+    std::string stationId;
     
     //funcs
     void FetchParams();

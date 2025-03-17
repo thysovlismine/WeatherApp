@@ -3,17 +3,18 @@
 #include <nlohmann/json.hpp>
 #include <wx/string.h>
 #include <wx/wx.h>
+#include <vector>
 
 
 //fetching more specific data about the station or sensor is a part of a additional info functions (they don't play a key in processing the data)
 
 struct StationIndexInfo{
-    int id;
-    wxString name;
+    std::string id;
+    std::string name;
 };
 
 struct SensorIndexInfo{
-    int id;
+    std::string id;
     wxString name;
 };
 
@@ -35,17 +36,15 @@ class LocalDB{
 
     //JSON Updating here
     static void UpdateIndex(std::string data);
-    static void UpdateStation(int stationId, std::string data);
-    static void UpdateSensor(int sensorId, std::string data);
+    static void UpdateStation(std::string stationId, std::string data);
+    static void UpdateSensor(std::string sensorId, std::string data);
 
     //Data loading
-    static StationIndexInfo* LoadIndex();
-    static SensorIndexInfo* LoadStation(int stationId);
-    static SensorDataset* LoadSensor(int sensorId);
+    static std::vector<StationIndexInfo> LoadIndex();
+    static std::vector<SensorIndexInfo> LoadStation(std::string stationId);
+    static std::vector<SensorDataset> LoadSensor(std::string sensorId);
 
     
-
-    private:
 
 };
 

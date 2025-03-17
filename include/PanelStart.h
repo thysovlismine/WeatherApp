@@ -17,9 +17,8 @@ class PanelStart : public Panel{
     wxStaticText* textTop = nullptr;
     
     //List
-    StationIndexInfo* data = nullptr;
+    std::vector<StationIndexInfo> data;
     wxListBox* listStations;
-    wxArrayInt stationIDs;  //database of station ids
     void ListStations_OnItemDoubleClicked(wxCommandEvent& event);
 
     //Button About

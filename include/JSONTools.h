@@ -7,7 +7,11 @@
 
 // Function declarations - Change references to const nlohmann::json&
 float JSON_ParseNumber(const nlohmann::json& item);
+float JSON_ParseNumber(const nlohmann::json& item, const std::string keyName);
 std::string JSON_ParseString(const nlohmann::json& item);
+std::string JSON_ParseString(const nlohmann::json& item, const std::string keyName);
+std::string JSON_ParseAsString(const nlohmann::json& item);
+std::string JSON_ParseAsString(const nlohmann::json& item, const std::string keyName);
 
 template <typename T>
 size_t JSON_Find(const T keyValue, const std::string keyName, const nlohmann::json& arr){

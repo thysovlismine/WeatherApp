@@ -59,39 +59,24 @@ void PanelStart::OnDataFetched(wxThreadEvent& event){
     //get response
     std::string response = event.GetPayload<std::string>();
     
-    //update DB
-    LocalDB::UpdateIndex(response);
-
-    //get data from the DB
-    data = LocalDB::LoadIndex();
-    //rest of the code should be reconfigured here
-
     //check error
     if(response.length() == 0){
         wxMessageBox("Failed to fetch data!", "Error", wxICON_ERROR | wxOK);
         return;
     }
+    else{
+        //update DB
+        LocalDB::UpdateIndex(response);
+    }
 
-    //parse json
-    try{
-        nlohmann::json responseJSON = nlohmann::json::parse(response);
-        
-        //add items
-        stationIDs.Clear();
-        listStations->Clear();
-        for (const auto& item : responseJSON)
-            if (
-                item.contains("id")
-                && item.contains("stationName")
-            ){
-                stationIDs.Add(item["id"].get<int>());
-                listStations->Append(wxString::FromUTF8(item["stationName"].get<std::string>()));
-            }
-    }
-    catch(const std::exception&){
-        //log
-        wxMessageBox("Failed to parse JSON!", "Error", wxICON_ERROR | wxOK);
-    }
+    //get data from the DB
+    data = LocalDB::LoadIndex();
+    size_t count = data.size();
+
+    //add items
+    listStations->Clear();
+    for(size_t i = 0; i < count; i++)
+        listStations->Append(wxString::FromUTF8(data[i].name));
 }
 
 //================================================================
@@ -99,7 +84,7 @@ void PanelStart::OnDataFetched(wxThreadEvent& event){
 void PanelStart::ListStations_OnItemDoubleClicked(wxCommandEvent& event){
     int index = listStations->GetSelection();
     if (index != wxNOT_FOUND) {
-        new PanelStation(this, stationIDs[index]);
+        new PanelStation(this, data[index].id);
     }
 }
 

@@ -73,23 +73,60 @@ void LocalDB::UpdateIndex(std::string data){
     }
 }
 
-void LocalDB::UpdateStation(int stationId, std::string data){
+void LocalDB::UpdateStation(std::string stationId, std::string data){
 
 }
 
-void LocalDB::UpdateSensor(int sensorId, std::string data){
+void LocalDB::UpdateSensor(std::string sensorId, std::string data){
 
 }
 
-StationIndexInfo* LocalDB::LoadIndex(){
-    return nullptr;
+std::vector<StationIndexInfo> LocalDB::LoadIndex(){
+    //load json
+    nlohmann::json present;
+
+    //prepare json
+    try{
+        //load file
+        std::ifstream inFile("index.json");
+        if(inFile){
+            //parse json
+            inFile >> present;  // Deserialize JSON data
+            inFile.close();
+        }
+        else{
+            //error
+            wxMessageBox("Error on LoadIndex (File doesn't exist)!!!!");
+            return std::vector<StationIndexInfo>();
+        }
+    }
+    catch(const std::exception&){
+        //error
+        wxMessageBox("Error on LoadIndex!!!!");
+        return std::vector<StationIndexInfo>();
+    }
+
+    //check count
+    size_t count = present.size();
+    if(count <= 0)
+        return std::vector<StationIndexInfo>();
+    
+    //write data
+    std::vector<StationIndexInfo> data(count);
+    while(count--){
+        data[count].id = JSON_ParseAsString(present[count]["id"]);            
+        data[count].name = JSON_ParseString(present[count]["stationName"]);
+    }
+
+    //return
+    return data;
 }
 
-SensorIndexInfo* LocalDB::LoadStation(int stationId){
-    return nullptr;
+std::vector<SensorIndexInfo> LocalDB::LoadStation(std::string stationId){
+    return std::vector<SensorIndexInfo>();
 }
 
-SensorDataset* LocalDB::LoadSensor(int sensorId){
-    return nullptr;
+std::vector<SensorDataset> LocalDB::LoadSensor(std::string sensorId){
+    return std::vector<SensorDataset>();
 }
 

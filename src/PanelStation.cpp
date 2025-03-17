@@ -4,7 +4,7 @@
 
 //================================================================
 
-PanelStation::PanelStation(Panel* origin, int _stationId) : Panel(origin){
+PanelStation::PanelStation(Panel* origin, std::string _stationId) : Panel(origin){
     //context
     stationId = _stationId;
 
@@ -47,7 +47,7 @@ void PanelStation::FetchParams(){
     listSensors->Disable();
 
     //fetch data
-    httpFetcher = new HttpFetcher(panel, "https://api.gios.gov.pl/pjp-api/rest/station/sensors/" + std::to_string(stationId));
+    httpFetcher = new HttpFetcher(panel, "https://api.gios.gov.pl/pjp-api/rest/station/sensors/" + stationId);
     httpFetcher->Fetch();
 }
 
