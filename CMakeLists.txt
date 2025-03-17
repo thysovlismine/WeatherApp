@@ -22,6 +22,7 @@ add_executable(app WIN32
     src/Panel.cpp
     src/WindowMain.cpp
     src/JSONTools.cpp
+    src/LocalDB.cpp
     src/HttpFetcher.cpp
     src/PanelStart.cpp
     src/PanelStation.cpp

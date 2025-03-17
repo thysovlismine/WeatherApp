@@ -58,6 +58,13 @@ void PanelStart::OnDataFetched(wxThreadEvent& event){
     
     //get response
     std::string response = event.GetPayload<std::string>();
+    
+    //update DB
+    LocalDB::UpdateIndex(response);
+
+    //get data from the DB
+    data = LocalDB::LoadIndex();
+    //rest of the code should be reconfigured here
 
     //check error
     if(response.length() == 0){

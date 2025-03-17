@@ -1,6 +1,7 @@
 #pragma once
 #include "Panel.h"
 #include "HttpFetcher.h"
+#include "LocalDB.h"
 
 class PanelStart : public Panel{
     public:
@@ -13,14 +14,15 @@ class PanelStart : public Panel{
     void OnDataFetched(wxThreadEvent& event);
 
     //Text top
-    wxStaticText* textTop;
+    wxStaticText* textTop = nullptr;
     
     //List
+    StationIndexInfo* data = nullptr;
     wxListBox* listStations;
     wxArrayInt stationIDs;  //database of station ids
     void ListStations_OnItemDoubleClicked(wxCommandEvent& event);
 
     //Button About
-    wxButton* button_about;
+    wxButton* button_about = nullptr;
     void ButtonAbout_OnButtonClick(wxCommandEvent& event);
 };
