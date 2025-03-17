@@ -1,9 +1,6 @@
 #pragma once
 #include "Panel.h"
-#include "PanelStation.h"
-#include "PanelAbout.h"
 #include "HttpFetcher.h"
-#include <nlohmann/json.hpp>
 
 class PanelStart : public Panel{
     public:

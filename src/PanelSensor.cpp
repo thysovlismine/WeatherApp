@@ -1,4 +1,5 @@
 #include "PanelSensor.h"
+#include "JSONTools.h"
 #include <wx/colour.h>
 #include <wx/charts/wxlinechartdatasetoptions.h>
 
@@ -88,22 +89,6 @@ PanelSensor::~PanelSensor(){
 }
 
 //================================================================
-
-float JSON_ParseNumber(nlohmann::json item){
-    try{
-        return item.get<float>();
-    }
-    catch(const std::exception&){}
-    return 0;
-}
-
-std::string JSON_ParseString(nlohmann::json item){
-    try{
-        return item.get<std::string>();
-    }
-    catch(const std::exception&){}
-    return "";
-}
 
 void PanelSensor::FetchData(){
     //block if already called

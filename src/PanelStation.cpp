@@ -1,4 +1,6 @@
 #include "PanelStation.h"
+#include "JSONTools.h"
+#include "PanelSensor.h"
 
 //================================================================
 

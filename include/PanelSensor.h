@@ -1,7 +1,6 @@
 #pragma once
 #include "Panel.h"
 #include "HttpFetcher.h"
-#include <nlohmann/json.hpp>
 #include <wx/app.h>
 #include <wx/charts/wxcharts.h>
 

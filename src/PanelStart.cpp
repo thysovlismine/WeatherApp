@@ -1,4 +1,7 @@
 #include "PanelStart.h"
+#include "PanelStation.h"
+#include "PanelAbout.h"
+#include "JSONTools.h"
 
 //================================================================
 
