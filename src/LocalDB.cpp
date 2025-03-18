@@ -13,6 +13,26 @@ bool parseDateTime(const std::string& datetime, std::tm& tm) {
     return !ss.fail(); // Return false if parsing fails
 }
 
+//ChatGPT
+void JSON_SortByDate(nlohmann::json& arr){
+    //ChatGPT
+    //Sort the remaining elements by date
+    std::sort(arr.begin(), arr.end(),
+        [](const nlohmann::json& a, const nlohmann::json& b) {
+            std::tm tmA, tmB;
+            parseDateTime(a["date"], tmA);
+            parseDateTime(b["date"], tmB);
+            return
+                std::tie(tmA.tm_year, tmA.tm_mon, tmA.tm_mday, 
+                tmA.tm_hour, tmA.tm_min, tmA.tm_sec)
+                <
+                std::tie(tmB.tm_year, tmB.tm_mon, tmB.tm_mday, 
+                tmB.tm_hour, tmB.tm_min, tmB.tm_sec)
+            ;
+        }
+    );
+}
+
 void UpdateGeneral(std::string data, std::string targetFile, std::string uniqueKeyName){
     //parse json
     nlohmann::json fetched;
@@ -83,6 +103,7 @@ void LocalDB::UpdateStation(std::string stationId, std::string data){
     UpdateGeneral(data, "station_" + stationId + ".json", "id");
 }
 
+
 void LocalDB::UpdateSensor(std::string sensorId, std::string data){
     //target file
     std::string targetFile = "sensor_" + sensorId + ".json";
@@ -121,9 +142,10 @@ void LocalDB::UpdateSensor(std::string sensorId, std::string data){
             inFile.close();
         }
         else{
-            //just make an empty array
-            //present = nlohmann::json::array();
-            //or skip processing part and save fetched to index.json
+            //sort fetched
+            JSON_SortByDate(fetched["values"]);
+
+            //save fetched to the target file
             std::ofstream outFile(targetFile);
             outFile << fetched.dump(4);
             outFile.close();
@@ -139,21 +161,8 @@ void LocalDB::UpdateSensor(std::string sensorId, std::string data){
     //update present with fresh
     JSON_UpdateArray(present["values"], fetched["values"], "date");
 
-    //ChatGPT
-    //Sort the remaining elements by date
-    std::sort(present["values"].begin(), present["values"].end(),
-        [](const nlohmann::json& a, const nlohmann::json& b) {
-            std::tm tmA, tmB;
-            parseDateTime(a["date"], tmA);
-            parseDateTime(b["date"], tmB);
-            return
-                std::tie(tmA.tm_year, tmA.tm_mon, tmA.tm_mday, 
-                tmA.tm_hour, tmA.tm_min, tmA.tm_sec)
-                >
-                std::tie(tmB.tm_year, tmB.tm_mon, tmB.tm_mday, 
-                tmB.tm_hour, tmB.tm_min, tmB.tm_sec)
-            ;
-    });
+    //sort present
+    JSON_SortByDate(present["values"]);
 
     //save the updated json
     try{
@@ -294,12 +303,12 @@ std::vector<SensorData> LocalDB::LoadSensor(std::string sensorId){
     
     //write data
     std::vector<SensorData> data(count);
-    for(size_t i = 0; i < count; i++){
+    while(count--){
         //check requierd fields
-        if(present[i].contains("value") && present[i].contains("date")){
+        if(present[count].contains("value") && present[count].contains("date")){
             //add
-            data[i].value = JSON_ParseNumber(present[i]["value"]);            
-            data[i].date = JSON_ParseString(present[i]["date"]);
+            data[count].value = JSON_ParseNumber(present[count]["value"]);            
+            data[count].date = JSON_ParseString(present[count]["date"]);
         }
     }
 

@@ -8,11 +8,6 @@ PanelSensor::PanelSensor(Panel* origin, std::string _sensorId) : Panel(origin){
     //context
     sensorId = _sensorId;
 
-    //List Sensors
-    list = new wxListBox(panel, wxID_ANY, wxPoint(410, 30), wxSize(400, 250));
-    
-    
-
     // Create the data for the line chart widget
     /*
 	wxVector<wxString> labels;
@@ -74,7 +69,6 @@ PanelSensor::PanelSensor(Panel* origin, std::string _sensorId) : Panel(origin){
 
 PanelSensor::~PanelSensor(){
     //destroy objects by pointers
-    list->Destroy(); list = nullptr;
     button_back->Destroy(); button_back = nullptr;
     if(chart != nullptr){
         chart->Destroy();
@@ -114,12 +108,10 @@ void PanelSensor::OnDataFetched(wxThreadEvent& event){
     size_t count = data.size();
 
     //add items
-    list->Clear();
     wxVector<wxString> labels;
     wxVector<wxDouble> points;
     for(size_t i = 0; i < count; i++){
-        list->Append(std::to_string(data[i].value));
-        labels.push_back(data[i].date);
+        labels.push_back(data[i].date.substr(11));
         points.push_back(data[i].value);
         //if(i==10)
         //    break;
@@ -146,7 +138,7 @@ void PanelSensor::OnDataFetched(wxThreadEvent& event){
         options.GetCommonOptions().SetShowTooltips(false);
         //options.GetGridOptions().SetShowGridLines(false);
         //
-        chart = new wxLineChartCtrl(panel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, options, wxPoint(10, 30), wxSize(400, 250), wxBORDER_NONE);
+        chart = new wxLineChartCtrl(panel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, options, wxPoint(10, 30), wxSize(610, 410), wxBORDER_NONE);
         
         
 

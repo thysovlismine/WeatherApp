@@ -117,18 +117,4 @@ void JSON_UpdateArray(nlohmann::json& arrPresent, const nlohmann::json& arrNew, 
     }
 }
 
-nlohmann::json JSON_MergeSort(const nlohmann::json& arr1, const nlohmann::json& arr2, const std::string& keyName) {
-    // Merge arrays
-    nlohmann::json mergedArray = arr1;
-    mergedArray.insert(mergedArray.end(), arr2.begin(), arr2.end());
 
-    // Sort safely
-    std::sort(mergedArray.begin(), mergedArray.end(), [&keyName](const nlohmann::json& a, const nlohmann::json& b) {
-        if (a.contains(keyName) && b.contains(keyName)) {
-            return a[keyName].dump() < b[keyName].dump();
-        }
-        return a.contains(keyName);
-    });
-
-    return mergedArray;
-}

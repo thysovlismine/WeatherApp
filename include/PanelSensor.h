@@ -25,9 +25,6 @@ class PanelSensor : public Panel{
     std::vector<SensorData> data;
     wxLineChartCtrl* chart = nullptr;
 
-    //List
-    wxListBox* list;
-
     //Button Back
     wxButton* button_back;
     void ButtonBack_OnButtonClick(wxCommandEvent& event);
