@@ -1,6 +1,17 @@
 #include "LocalDB.h"
 #include "JSONTools.h"
 #include <fstream>
+#include <vector>
+#include <algorithm>
+#include <iomanip>
+#include <sstream>
+
+//ChatGPT
+bool parseDateTime(const std::string& datetime, std::tm& tm) {
+    std::istringstream ss(datetime);
+    ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+    return !ss.fail(); // Return false if parsing fails
+}
 
 void UpdateGeneral(std::string data, std::string targetFile, std::string uniqueKeyName){
     //parse json
@@ -11,6 +22,9 @@ void UpdateGeneral(std::string data, std::string targetFile, std::string uniqueK
     try{
         //parse fetched data
         fetched = nlohmann::json::parse(data);
+
+        //make sure fetched contains unique entries
+        JSON_Unique(fetched, uniqueKeyName);
         
         //check required param
         if(!fetched.is_array())
@@ -41,19 +55,7 @@ void UpdateGeneral(std::string data, std::string targetFile, std::string uniqueK
 
     //update present with fresh
     try{
-        size_t i = 0;
-        //scan fetched array
-        for (const auto& item : fetched) {
-            //find index of a present item with the same id
-            i = JSON_Find(item[uniqueKeyName], uniqueKeyName, present);
-            if(i){
-                //update data of this item
-                present[--i] = item;
-            }else{
-                //add this item to the present
-                present.push_back(item);
-            }
-        }
+        JSON_UpdateArray(present, fetched, uniqueKeyName);
     }
     catch(const std::exception&){
         //error
@@ -99,6 +101,17 @@ void LocalDB::UpdateSensor(std::string sensorId, std::string data){
             return;
         if(!fetched["values"].is_array())
             return;
+
+        //make sure fetched contains unique entries
+        JSON_Unique(fetched["values"], "date");
+
+        //ChatGPT
+        //Remove elements with invalid dates
+        fetched["values"].erase(std::remove_if(fetched["values"].begin(), fetched["values"].end(),
+            [](const nlohmann::json& item) {
+                std::tm tm;
+                return !parseDateTime(item.value("date", ""), tm); // Remove if parsing fails
+            }), fetched["values"].end());
         
         //load file
         std::ifstream inFile(targetFile);
@@ -123,9 +136,25 @@ void LocalDB::UpdateSensor(std::string sensorId, std::string data){
         return;
     }
     
-    //merge arrays into an sorted array
-    present["values"] = JSON_MergeSort(fetched["values"], present["values"], "date");
-    
+    //update present with fresh
+    JSON_UpdateArray(present["values"], fetched["values"], "date");
+
+    //ChatGPT
+    //Sort the remaining elements by date
+    std::sort(present["values"].begin(), present["values"].end(),
+        [](const nlohmann::json& a, const nlohmann::json& b) {
+            std::tm tmA, tmB;
+            parseDateTime(a["date"], tmA);
+            parseDateTime(b["date"], tmB);
+            return
+                std::tie(tmA.tm_year, tmA.tm_mon, tmA.tm_mday, 
+                tmA.tm_hour, tmA.tm_min, tmA.tm_sec)
+                >
+                std::tie(tmB.tm_year, tmB.tm_mon, tmB.tm_mday, 
+                tmB.tm_hour, tmB.tm_min, tmB.tm_sec)
+            ;
+    });
+
     //save the updated json
     try{
         //save present to file
@@ -265,12 +294,12 @@ std::vector<SensorData> LocalDB::LoadSensor(std::string sensorId){
     
     //write data
     std::vector<SensorData> data(count);
-    while(count--){
+    for(size_t i = 0; i < count; i++){
         //check requierd fields
-        if(present[count].contains("value") && present[count].contains("date")){
+        if(present[i].contains("value") && present[i].contains("date")){
             //add
-            data[count].value = JSON_ParseNumber(present[count]["value"]);            
-            data[count].date = JSON_ParseString(present[count]["date"]);
+            data[i].value = JSON_ParseNumber(present[i]["value"]);            
+            data[i].date = JSON_ParseString(present[i]["date"]);
         }
     }
 

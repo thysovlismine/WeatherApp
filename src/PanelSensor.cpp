@@ -1,5 +1,4 @@
 #include "PanelSensor.h"
-#include "JSONTools.h"
 #include <wx/colour.h>
 #include <wx/charts/wxlinechartdatasetoptions.h>
 
@@ -125,43 +124,6 @@ void PanelSensor::OnDataFetched(wxThreadEvent& event){
         //if(i==10)
         //    break;
     }
-
-
-    //make chart
-    
-    // Create the data for the line chart widget
-    //wxChartsCategoricalData::ptr chartData = wxChartsCategoricalData::make_shared(labels);
-
-    // Add the first dataset
-    //wxVector<wxDouble> points;
-    //wxChartsDoubleDataset::ptr dataset1(new wxChartsDoubleDataset("My First Dataset", points));
-
-    
-    //list->Append("start");
-    //add items
-    //wxChartData seriesData;
-    //wxVector<wxString> labels;
-    //wxVector<wxDouble> points;
-
-    //list->Append(wxString::FromUTF8(std::to_string(JSON_ParseNumber(item["value"]))));
-
-
-    /*
-    if(responseJSON.contains("values")){
-        for (const auto& item : responseJSON["values"]){
-            if (item.contains("date")
-                && item.contains("value")
-            ){
-                list->Append(wxString::FromUTF8(std::to_string(JSON_ParseNumber(item["value"]))));
-                labels.push_back(JSON_ParseString(item["date"]));
-                points.push_back(JSON_ParseNumber(item["value"]));
-            }
-            else{
-                list->Append("gag");
-            }
-        }
-    }
-        */
     
     //labels
     wxChartsCategoricalData::ptr chartData = wxChartsCategoricalData::make_shared(labels);
