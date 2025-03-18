@@ -4,6 +4,7 @@
 
 #include <nlohmann/json.hpp>
 #include <string>
+#include <algorithm>
 
 // Function declarations - Change references to const nlohmann::json&
 float JSON_ParseNumber(const nlohmann::json& item);
@@ -32,5 +33,8 @@ size_t JSON_Find(const T keyValue, const std::string keyName, const nlohmann::js
     }
     return 0;
 }
+
+nlohmann::json JSON_MergeSort(const nlohmann::json& arr1, const nlohmann::json& arr2, const std::string& keyName);
+
 
 #endif // JSONTOOLS_H

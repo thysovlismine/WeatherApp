@@ -107,67 +107,87 @@ void PanelSensor::OnDataFetched(wxThreadEvent& event){
     //get response
     std::string response = event.GetPayload<std::string>();
 
-    //parse json
-    try{
-        nlohmann::json responseJSON = nlohmann::json::parse(response);
-        
-        // Create the data for the line chart widget
-        //wxChartsCategoricalData::ptr chartData = wxChartsCategoricalData::make_shared(labels);
+    //Update DB
+    LocalDB::UpdateSensor(sensorId, response);
 
-        // Add the first dataset
-        //wxVector<wxDouble> points;
-        //wxChartsDoubleDataset::ptr dataset1(new wxChartsDoubleDataset("My First Dataset", points));
+    //get data
+    data = LocalDB::LoadSensor(sensorId);
+    size_t count = data.size();
 
-        list->Append("start");
-        //add items
-        //wxChartData seriesData;
-        wxVector<wxString> labels;
-        wxVector<wxDouble> points;
-        if(responseJSON.contains("values")){
-            for (const auto& item : responseJSON["values"]){
-                if (item.contains("date")
-                    && item.contains("value")
-                ){
-                    list->Append(wxString::FromUTF8(std::to_string(JSON_ParseNumber(item["value"]))));
-                    labels.push_back(JSON_ParseString(item["date"]));
-                    points.push_back(JSON_ParseNumber(item["value"]));
-                }
-                else{
-                    list->Append("gag");
-                }
+    //add items
+    list->Clear();
+    wxVector<wxString> labels;
+    wxVector<wxDouble> points;
+    for(size_t i = 0; i < count; i++){
+        list->Append(std::to_string(data[i].value));
+        labels.push_back(data[i].date);
+        points.push_back(data[i].value);
+        //if(i==10)
+        //    break;
+    }
+
+
+    //make chart
+    
+    // Create the data for the line chart widget
+    //wxChartsCategoricalData::ptr chartData = wxChartsCategoricalData::make_shared(labels);
+
+    // Add the first dataset
+    //wxVector<wxDouble> points;
+    //wxChartsDoubleDataset::ptr dataset1(new wxChartsDoubleDataset("My First Dataset", points));
+
+    
+    //list->Append("start");
+    //add items
+    //wxChartData seriesData;
+    //wxVector<wxString> labels;
+    //wxVector<wxDouble> points;
+
+    //list->Append(wxString::FromUTF8(std::to_string(JSON_ParseNumber(item["value"]))));
+
+
+    /*
+    if(responseJSON.contains("values")){
+        for (const auto& item : responseJSON["values"]){
+            if (item.contains("date")
+                && item.contains("value")
+            ){
+                list->Append(wxString::FromUTF8(std::to_string(JSON_ParseNumber(item["value"]))));
+                labels.push_back(JSON_ParseString(item["date"]));
+                points.push_back(JSON_ParseNumber(item["value"]));
+            }
+            else{
+                list->Append("gag");
             }
         }
-        
-        //labels
-        wxChartsCategoricalData::ptr chartData = wxChartsCategoricalData::make_shared(labels);
-        
-        //points
-        wxChartsDoubleDataset::ptr chartDataSet(new wxChartsDoubleDataset("My First Dataset", points));
-        chartData->AddDataset(chartDataSet);
-        
-        //style
-        // define pen color
-        /*
-        wxChartsDatasetTheme *datasetTheme = new wxChartsDatasetTheme();
-        datasetTheme->SetLineChartDatasetOptions(wxLineChartDatasetOptions(wxColour("Red"), wxColour("Red"), wxColour("Red")));
-        wxChartsDefaultTheme->SetDatasetTheme(wxChartsDatasetId::CreateImplicitId(0),wxSharedPtr<wxChartsDatasetTheme>(datasetTheme));
-        */
-
-        //Create the line chart widget from the constructed data
-        if(chart == nullptr){
-            //https://github.com/wxIshiko/wxCharts/issues/3
-            wxLineChartOptions options;
-            options.GetCommonOptions().SetShowTooltips(false);
-            //options.GetGridOptions().SetShowGridLines(false);
-            //
-            chart = new wxLineChartCtrl(panel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, options, wxPoint(10, 30), wxSize(400, 250), wxBORDER_NONE);
-            
-            
-
-        }
     }
-    catch(const std::exception&){
-        ;
+        */
+    
+    //labels
+    wxChartsCategoricalData::ptr chartData = wxChartsCategoricalData::make_shared(labels);
+    
+    //points
+    wxChartsDoubleDataset::ptr chartDataSet(new wxChartsDoubleDataset("My First Dataset", points));
+    chartData->AddDataset(chartDataSet);
+    
+    //style
+    // define pen color
+    
+    //wxChartsDatasetTheme *datasetTheme = new wxChartsDatasetTheme();
+    //datasetTheme->SetLineChartDatasetOptions(wxLineChartDatasetOptions(wxColour("Red"), wxColour("Red"), wxColour("Red")));
+    //wxChartsDefaultTheme->SetDatasetTheme(wxChartsDatasetId::CreateImplicitId(0),wxSharedPtr<wxChartsDatasetTheme>(datasetTheme));
+
+    //Create the line chart widget from the constructed data
+    if(chart == nullptr){
+        //https://github.com/wxIshiko/wxCharts/issues/3
+        wxLineChartOptions options;
+        options.GetCommonOptions().SetShowTooltips(false);
+        //options.GetGridOptions().SetShowGridLines(false);
+        //
+        chart = new wxLineChartCtrl(panel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, options, wxPoint(10, 30), wxSize(400, 250), wxBORDER_NONE);
+        
+        
+
     }
 }
 

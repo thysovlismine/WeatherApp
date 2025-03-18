@@ -23,14 +23,6 @@ struct SensorData{
     std::string date;
 };
 
-class SensorDataset{
-    public:
-    SensorData* data;
-    SensorDataset();
-    ~SensorDataset();
-};
-
-
 class LocalDB{
     public:
 
@@ -42,7 +34,7 @@ class LocalDB{
     //Data loading
     static std::vector<StationIndexInfo> LoadIndex();
     static std::vector<SensorIndexInfo> LoadStation(std::string stationId);
-    static std::vector<SensorDataset> LoadSensor(std::string sensorId);
+    static std::vector<SensorData> LoadSensor(std::string sensorId);
 
     
 

@@ -2,10 +2,6 @@
 #include "JSONTools.h"
 #include <fstream>
 
-
-SensorDataset::SensorDataset(){}
-SensorDataset::~SensorDataset(){}
-
 void UpdateGeneral(std::string data, std::string targetFile, std::string uniqueKeyName){
     //parse json
     nlohmann::json fetched;
@@ -16,6 +12,10 @@ void UpdateGeneral(std::string data, std::string targetFile, std::string uniqueK
         //parse fetched data
         fetched = nlohmann::json::parse(data);
         
+        //check required param
+        if(!fetched.is_array())
+            return;
+
         //load file
         std::ifstream inFile(targetFile);
         if(inFile){
@@ -82,7 +82,61 @@ void LocalDB::UpdateStation(std::string stationId, std::string data){
 }
 
 void LocalDB::UpdateSensor(std::string sensorId, std::string data){
-
+    //target file
+    std::string targetFile = "sensor_" + sensorId + ".json";
+    
+    //parse json
+    nlohmann::json fetched;
+    nlohmann::json present;
+    
+    //prepare jsons
+    try{
+        //parse fetched data
+        fetched = nlohmann::json::parse(data);
+        
+        //check required parm
+        if(!fetched.contains("values"))
+            return;
+        if(!fetched["values"].is_array())
+            return;
+        
+        //load file
+        std::ifstream inFile(targetFile);
+        if(inFile){
+            //parse json
+            inFile >> present;  // Deserialize JSON data
+            inFile.close();
+        }
+        else{
+            //just make an empty array
+            //present = nlohmann::json::array();
+            //or skip processing part and save fetched to index.json
+            std::ofstream outFile(targetFile);
+            outFile << fetched.dump(4);
+            outFile.close();
+            return;
+        }
+    }
+    catch(const std::exception&){
+        //error
+        wxMessageBox("Error on UpdateGeneral!!!!");
+        return;
+    }
+    
+    //merge arrays into an sorted array
+    present["values"] = JSON_MergeSort(fetched["values"], present["values"], "date");
+    
+    //save the updated json
+    try{
+        //save present to file
+        std::ofstream outFile(targetFile);
+        outFile << present.dump(4);
+        outFile.close();
+    }
+    catch(const std::exception&){
+        //error
+        wxMessageBox("Error on UpdateSensor at saving part!!!!");
+    }
 }
 
 std::vector<StationIndexInfo> LocalDB::LoadIndex(){
@@ -176,7 +230,51 @@ std::vector<SensorIndexInfo> LocalDB::LoadStation(std::string stationId){
     return data;
 }
 
-std::vector<SensorDataset> LocalDB::LoadSensor(std::string sensorId){
-    return std::vector<SensorDataset>();
+std::vector<SensorData> LocalDB::LoadSensor(std::string sensorId){
+    //load json
+    nlohmann::json present;
+
+    //prepare json
+    try{
+        //load file
+        std::ifstream inFile("sensor_" + sensorId + ".json");
+        if(inFile){
+            //parse json
+            inFile >> present;  // Deserialize JSON data
+            inFile.close();
+        }
+        else{
+            //error
+            wxMessageBox("Error on LoadSensor (File doesn't exist)!!!!");
+            return std::vector<SensorData>();
+        }
+    }
+    catch(const std::exception&){
+        //error
+        wxMessageBox("Error on LoadSensor!!!!");
+        return std::vector<SensorData>();
+    }
+
+    //scope to values
+    present = present["values"];
+
+    //check count
+    size_t count = present.size();
+    if(count <= 0)
+        return std::vector<SensorData>();
+    
+    //write data
+    std::vector<SensorData> data(count);
+    while(count--){
+        //check requierd fields
+        if(present[count].contains("value") && present[count].contains("date")){
+            //add
+            data[count].value = JSON_ParseNumber(present[count]["value"]);            
+            data[count].date = JSON_ParseString(present[count]["date"]);
+        }
+    }
+
+    //return
+    return data;
 }
 

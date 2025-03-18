@@ -1,6 +1,7 @@
 #pragma once
 #include "Panel.h"
 #include "HttpFetcher.h"
+#include "LocalDB.h"
 #include <wx/app.h>
 #include <wx/charts/wxcharts.h>
 
@@ -21,6 +22,7 @@ class PanelSensor : public Panel{
     wxStaticText* textTop;
 
     //chart
+    std::vector<SensorData> data;
     wxLineChartCtrl* chart = nullptr;
 
     //List
