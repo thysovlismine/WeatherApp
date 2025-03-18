@@ -4,6 +4,8 @@
 #include "LocalDB.h"
 #include <wx/app.h>
 #include <wx/charts/wxcharts.h>
+#include <wx/slider.h>
+
 
 class PanelSensor : public Panel{
     public:
@@ -17,13 +19,23 @@ class PanelSensor : public Panel{
     void FetchData();
     HttpFetcher* httpFetcher = nullptr;
     void OnDataFetched(wxThreadEvent& event);
+    void OnWindowResized(wxSizeEvent& event);
 
     //Text top
     wxStaticText* textTop;
 
+    //slider
+    wxSlider* slider;
+    void OnSliderChanged(wxCommandEvent& event);
+    const int sliderMinValue = 0;
+    const int sliderMaxValue = 1000;
+
     //chart
     std::vector<SensorData> data;
     wxLineChartCtrl* chart = nullptr;
+    size_t chartLastStartIndex = 0;
+    void UpdateChart();
+    void UpdateChartSize();
 
     //Button Back
     wxButton* button_back;

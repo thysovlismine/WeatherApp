@@ -54,9 +54,12 @@ PanelSensor::PanelSensor(Panel* origin, std::string _sensorId) : Panel(origin){
 	//panelSizer->Add(legendCtrl, 1, wxEXPAND);
 	//panel->SetSizer(panelSizer);
 
+    //window event
+    mainWindow->Bind(wxEVT_SIZE, &PanelSensor::OnWindowResized, this);
 
-
-
+    //Slider
+    slider = new wxSlider(panel, wxID_ANY, (PanelSensor::sliderMaxValue + PanelSensor::sliderMinValue) / 2, PanelSensor::sliderMinValue, PanelSensor::sliderMaxValue, wxPoint(10, 10), wxSize(300, -1), wxSL_HORIZONTAL);
+    slider->Bind(wxEVT_SLIDER, &PanelSensor::OnSliderChanged, this);
 
     //Button Back
     button_back = new wxButton(panel, wxID_ANY, "<--", wxPoint(10, 300), wxSize(100, 40));
@@ -69,6 +72,7 @@ PanelSensor::PanelSensor(Panel* origin, std::string _sensorId) : Panel(origin){
 
 PanelSensor::~PanelSensor(){
     //destroy objects by pointers
+    slider->Destroy(); slider = nullptr;
     button_back->Destroy(); button_back = nullptr;
     if(chart != nullptr){
         chart->Destroy();
@@ -79,6 +83,13 @@ PanelSensor::~PanelSensor(){
         httpFetcher->Destroy();
         httpFetcher = nullptr;
     }
+}
+
+//================================================================
+
+void PanelSensor::OnWindowResized(wxSizeEvent& event){
+    UpdateChartSize();
+    mainWindow->Layout();
 }
 
 //================================================================
@@ -102,15 +113,49 @@ void PanelSensor::OnDataFetched(wxThreadEvent& event){
 
     //Update DB
     LocalDB::UpdateSensor(sensorId, response);
-
+    
     //get data
     data = LocalDB::LoadSensor(sensorId);
+    
+    //Update chart
+    UpdateChart();
+}
+
+//================================================================
+
+void PanelSensor::OnSliderChanged(wxCommandEvent& event){
+    UpdateChart();
+}
+
+//================================================================
+
+void PanelSensor::UpdateChartSize(){
+    wxSize newSize = mainWindow->GetSize();
+    newSize.SetWidth(newSize.GetWidth() - 60);
+    newSize.SetHeight(newSize.GetHeight() - 60);
+    chart->SetSize(newSize);
+}
+
+void PanelSensor::UpdateChart(){
+    //get range
     size_t count = data.size();
+    size_t i = count * ((float)(slider->GetValue() - PanelSensor::sliderMinValue) / (float)(PanelSensor::sliderMaxValue - PanelSensor::sliderMinValue));
+
+    //check if it is neccessery to render
+    if(chartLastStartIndex == i)
+        return;
+    chartLastStartIndex = i;
+
+    //destroy chart
+    if(chart != nullptr){
+        chart->Destroy();
+        chart = nullptr;
+    }
 
     //add items
     wxVector<wxString> labels;
     wxVector<wxDouble> points;
-    for(size_t i = 0; i < count; i++){
+    for(; i < count; i++){
         labels.push_back(data[i].date.substr(11));
         points.push_back(data[i].value);
         //if(i==10)
@@ -132,17 +177,14 @@ void PanelSensor::OnDataFetched(wxThreadEvent& event){
     //wxChartsDefaultTheme->SetDatasetTheme(wxChartsDatasetId::CreateImplicitId(0),wxSharedPtr<wxChartsDatasetTheme>(datasetTheme));
 
     //Create the line chart widget from the constructed data
-    if(chart == nullptr){
-        //https://github.com/wxIshiko/wxCharts/issues/3
-        wxLineChartOptions options;
-        options.GetCommonOptions().SetShowTooltips(false);
-        //options.GetGridOptions().SetShowGridLines(false);
-        //
-        chart = new wxLineChartCtrl(panel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, options, wxPoint(10, 30), wxSize(610, 410), wxBORDER_NONE);
-        
-        
-
-    }
+    
+    //https://github.com/wxIshiko/wxCharts/issues/3
+    wxLineChartOptions options;
+    options.GetCommonOptions().SetShowTooltips(false);
+    //options.GetGridOptions().SetShowGridLines(false);
+    //
+    chart = new wxLineChartCtrl(panel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, options, wxPoint(10, 30), wxSize(610, 410), wxBORDER_NONE);
+    UpdateChartSize();
 }
 
 //================================================================
