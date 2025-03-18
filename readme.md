@@ -1,4 +1,23 @@
 
+# Requirements
+
+```
+vcpkg install nlohmann-json
+vcpkg install cpr
+vcpkg install wxwidgets
+vcpkg install wxcharts
+```
+
+# Compiling
+
+Replace `@@@VCPKPG_CMAKE_PATH_HERE@@@` with the path to the VCPKG cmake file which can be checked via `vcpkg integrate install`.
+```
+mkdir build
+cd build
+cmake .. -DCMAKE_TOOLCHAIN_FILE=@@@VCPKPG_CMAKE_PATH_HERE@@@
+cmake --build .
+```
+
 # Plan Kodu
 
 - `WindowMain` - Wybór stacji Pomiarowej.
