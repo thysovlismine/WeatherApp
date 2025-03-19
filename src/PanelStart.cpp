@@ -1,6 +1,7 @@
 #include "PanelStart.h"
 #include "PanelStation.h"
 #include "PanelAbout.h"
+#include "JSONTools.h"
 
 //================================================================
 
@@ -68,14 +69,29 @@ void PanelStart::OnDataFetched(wxThreadEvent& event){
         LocalDB::UpdateIndex(response);
     }
 
-    //get data from the DB
-    data = LocalDB::LoadIndex();
-    size_t count = data.size();
-
-    //add items
+    //clear list
     listStations->Clear();
-    for(size_t i = 0; i < count; i++)
-        listStations->Append(wxString::FromUTF8(data[i].name));
+
+    //get data from the DB
+    if(LocalDB::LoadIndex(data)){
+        //process json
+        size_t count = data.size();
+        std::string name;
+        //add items
+        for(size_t i = 0; i < count; i++){
+            //get name
+            name = JSON_ParseString(data[i], "stationName");
+            //correct weird name
+            if(name.length() <= 0)
+                name = "Untitled (" + JSON_ParseAsString(data[i], "id") + ")";
+            //add
+            listStations->Append(wxString::FromUTF8(name));
+        }
+    }
+    else{
+        //Load failed
+
+    }
 }
 
 //================================================================
@@ -83,7 +99,8 @@ void PanelStart::OnDataFetched(wxThreadEvent& event){
 void PanelStart::ListStations_OnItemDoubleClicked(wxCommandEvent& event){
     int index = listStations->GetSelection();
     if (index != wxNOT_FOUND) {
-        new PanelStation(this, data[index].id);
+        std::string id = JSON_ParseAsString(data[index], "id");
+        new PanelStation(this, id);
     }
 }
 

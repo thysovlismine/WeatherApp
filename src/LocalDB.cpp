@@ -177,6 +177,7 @@ void LocalDB::UpdateSensor(std::string sensorId, std::string data){
     }
 }
 
+/*
 std::vector<StationIndexInfo> LocalDB::LoadIndex(){
     //load json
     nlohmann::json present;
@@ -220,6 +221,29 @@ std::vector<StationIndexInfo> LocalDB::LoadIndex(){
 
     //return
     return data;
+}
+*/
+
+bool LoadJSON(nlohmann::json& data, std::string targetFile){
+    try{
+        std::ifstream inFile(targetFile);
+        if(inFile){
+            //parse json
+            inFile >> data;  // Deserialize JSON data
+            inFile.close();
+            //load was successful
+            return true;
+        }
+    }
+    catch(const std::exception&){
+        //do nothing
+    }
+    //couldn't load file
+    return false;
+}
+
+bool LocalDB::LoadIndex(nlohmann::json& data){
+    return LoadJSON(data, "index.json");
 }
 
 std::vector<SensorIndexInfo> LocalDB::LoadStation(std::string stationId){

@@ -32,10 +32,11 @@ class LocalDB{
     static void UpdateSensor(std::string sensorId, std::string data);
 
     //Data loading
-    static std::vector<StationIndexInfo> LoadIndex();
     static std::vector<SensorIndexInfo> LoadStation(std::string stationId);
     static std::vector<SensorData> LoadSensor(std::string sensorId);
-
+    
+    //Data loading JSON
+    static bool LoadIndex(nlohmann::json& data);
     
 
 };
