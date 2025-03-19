@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <unordered_set>
 #include <fstream>
+#include <sstream>
 
 float JSON_ParseNumber(const nlohmann::json& item) {
     try{
@@ -153,3 +154,11 @@ void JSON_UpdateArray(nlohmann::json& arrPresent, const nlohmann::json& arrNew, 
 }
 
 
+//other
+
+//ChatGPT
+bool parseDateTime(const std::string& datetime, std::tm& tm) {
+    std::istringstream ss(datetime);
+    ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+    return !ss.fail(); // Return false if parsing fails
+}

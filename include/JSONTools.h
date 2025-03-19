@@ -23,5 +23,9 @@ size_t JSON_Find(const std::string& keyValueDumped, const std::string& keyName, 
 
 void JSON_UpdateArray(nlohmann::json& present, const nlohmann::json& fetched, const std::string& uniqueKeyName);
 
+//other
+
+bool parseDateTime(const std::string& datetime, std::tm& tm);
+
 
 #endif // JSONTOOLS_H

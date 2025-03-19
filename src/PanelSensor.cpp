@@ -89,7 +89,7 @@ PanelSensor::~PanelSensor(){
 //================================================================
 
 void PanelSensor::OnWindowResized(wxSizeEvent& event){
-    UpdateChartSize();
+    UpdateChart();
     mainWindow->Layout();
 }
 
@@ -162,11 +162,6 @@ void PanelSensor::UpdateChart(){
     size_t count = data["values"].size();
     size_t i = count * ((float)(slider->GetValue() - slider->GetMin()) / (float)(slider->GetMax() - slider->GetMin()));
 
-    //check if it is neccessery to render
-    if(chartLastStartIndex == i)
-        return;
-    chartLastStartIndex = i;
-
     //skip i=count
     if(i == count)
         return;
@@ -185,18 +180,44 @@ void PanelSensor::UpdateChart(){
     const int labelStepSize = ((mainWindow->GetSize().GetWidth() - 0) - 0) / (count - i);
 
     //distance
-    int labelDistance = 99999;
+    int labelDistance = INT_MAX - labelStepSize;
 
     //add items
     wxVector<wxString> labels;
     wxVector<wxDouble> points;
-    float y;
     std::string x;
+    float y;
+    std::tm time;
+    std::tm last_time = {};
+    last_time.tm_sec = 0;    // Seconds [0, 60] (including leap second)
+    last_time.tm_min = 0;    // Minutes [0, 59]
+    last_time.tm_hour = 0;   // Hours [0, 23]
+    last_time.tm_mday = 1;   // Day of month [1, 31]
+    last_time.tm_mon = 0;    // Months since January [0, 11]
+    last_time.tm_year = 0;   // Years since 1900 (year 1900)
+    last_time.tm_wday = 0;   // Days since Sunday [0, 6] (computed automatically)
+    last_time.tm_yday = 0;   // Days since Jan 1 [0, 365] (computed automatically)
+    last_time.tm_isdst = -1; // Let the system determine daylight saving time;
     for(; i < count; i++){
-        //get ppint
+        //get point
         x = JSON_ParseString(data["values"][i], "date");
         y = JSON_ParseNumber(data["values"][i], "value");
         
+        //correct label name
+        if(parseDateTime(x, time)){
+            //check date
+            if(
+                time.tm_year == last_time.tm_year 
+                &&
+                time.tm_mon == last_time.tm_mon
+                &&
+                time.tm_mday == last_time.tm_mday
+            )
+                x = std::to_string(time.tm_hour) + ":" + std::to_string(time.tm_min)  + ":" + std::to_string(time.tm_sec);    
+        }else{
+            x = "?";
+        }
+
         //get text size
         dc.GetTextExtent(wxString::FromUTF8(x), &labelTextWidth, &labelTextHeight);
         labelTextWidth /= 2;
@@ -215,6 +236,10 @@ void PanelSensor::UpdateChart(){
         //add points
         labels.push_back(x);
         points.push_back(y);
+
+        //remember date
+        if(x.length() > 0)
+            last_time = time;
     }
     
     //labels

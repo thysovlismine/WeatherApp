@@ -34,7 +34,6 @@ class PanelSensor : public Panel{
     //chart
     nlohmann::json data;
     wxLineChartCtrl* chart = nullptr;
-    size_t chartLastStartIndex = 0;
     void UpdateChart();
     void UpdateChartSize();
 

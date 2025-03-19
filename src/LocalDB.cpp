@@ -4,14 +4,6 @@
 #include <vector>
 #include <algorithm>
 #include <iomanip>
-#include <sstream>
-
-//ChatGPT
-bool parseDateTime(const std::string& datetime, std::tm& tm) {
-    std::istringstream ss(datetime);
-    ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
-    return !ss.fail(); // Return false if parsing fails
-}
 
 //ChatGPT
 void JSON_SortByDate(nlohmann::json& arr){
