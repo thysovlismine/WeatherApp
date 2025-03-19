@@ -5,6 +5,7 @@
 #include <wx/app.h>
 #include <wx/charts/wxcharts.h>
 #include <wx/slider.h>
+#include <wx/richtext/richtextctrl.h>
 
 
 class PanelSensor : public Panel{
@@ -19,7 +20,10 @@ class PanelSensor : public Panel{
     void FetchData();
     HttpFetcher* httpFetcher = nullptr;
     void OnDataFetched(wxThreadEvent& event);
+    void UpdateGUI();
     void OnWindowResized(wxSizeEvent& event);
+    void OnWindowMaximized(wxMaximizeEvent& event);
+    void OnFullScreen(wxFullScreenEvent& event);
 
     //Text top
     wxStaticText* textTop;
@@ -31,7 +35,10 @@ class PanelSensor : public Panel{
     const int sliderMaxValue = 1000;
     const int startingValueCount = 24;
 
-    //info bar
+    //info stats
+    wxRichTextCtrl* richText;
+    void UpdateRichTextText();
+    void UpdateRichTextTransofrm();
 
     //chart
     nlohmann::json data;
@@ -42,14 +49,14 @@ class PanelSensor : public Panel{
     //chart info
     int chartValidCount;
     float chartSum;
-    size_t chartMinIndex;
-    size_t chartMaxIndex;
+    size_t chartMinIndex = 0;
+    size_t chartMaxIndex = 0;
 
     //current chart info
     int chartLocalValidCount;
     float chartLocalSum;
-    size_t chartLocalMinIndex;
-    size_t chartLocalMaxIndex;
+    size_t chartLocalMinIndex = 0;
+    size_t chartLocalMaxIndex = 0;
 
     //Button Back
     wxButton* button_back;

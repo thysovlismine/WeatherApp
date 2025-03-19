@@ -10,62 +10,24 @@ PanelSensor::PanelSensor(Panel* origin, std::string _sensorId) : Panel(origin){
     //context
     sensorId = _sensorId;
 
-    // Create the data for the line chart widget
-    /*
-	wxVector<wxString> labels;
-	labels.push_back("January");
-	labels.push_back("February");
-	labels.push_back("March");
-	labels.push_back("April");
-	labels.push_back("May");
-	labels.push_back("June");
-
-	labels.push_back("July1");
-    labels.push_back("July2");
-    labels.push_back("July3");
-    labels.push_back("July4");
-    wxChartsCategoricalData::ptr chartData = wxChartsCategoricalData::make_shared(labels);
-    
-	// Add the first dataset
-	wxVector<wxDouble> points1;
-	points1.push_back(3);
-	points1.push_back(-2.5);
-	points1.push_back(-1.2);
-	points1.push_back(3);
-	points1.push_back(6);
-	points1.push_back(5);
-
-    points1.push_back(1);
-    points1.push_back(2);
-    points1.push_back(3);
-    points1.push_back(4);
-    wxChartsDoubleDataset::ptr dataset1(new wxChartsDoubleDataset("My First Dataset", points1));
-	chartData->AddDataset(dataset1);
-
-    //chart
-	chart = new wxLineChartCtrl(panel, wxID_ANY, chartData, wxCHARTSLINETYPE_STEPPED, wxPoint(10, 30), wxSize(400, 250), wxBORDER_NONE);
-    */
-   
-    // Create the legend widget (optional)
-	//wxChartsLegendData legendData(chartData->GetDatasets());
-	//wxChartsLegendCtrl* legendCtrl = new wxChartsLegendCtrl(panel, wxID_ANY, legendData, wxPoint(0, 0), wxSize(100, 100), wxBORDER_NONE);
-
-    // Set up the sizer for the panel
-	//wxBoxSizer* panelSizer = new wxBoxSizer(wxHORIZONTAL);
-	//panelSizer->Add(lineChartCtrl, 1, wxEXPAND);
-	//panelSizer->Add(legendCtrl, 1, wxEXPAND);
-	//panel->SetSizer(panelSizer);
-
     //window event
     mainWindow->Bind(wxEVT_SIZE, &PanelSensor::OnWindowResized, this);
-
-    //Slider
-    slider = new wxSlider(panel, wxID_ANY, (PanelSensor::sliderMaxValue + PanelSensor::sliderMinValue) / 2, PanelSensor::sliderMinValue, PanelSensor::sliderMaxValue, wxPoint(10, 10), wxSize(300, -1), wxSL_HORIZONTAL);
-    slider->Bind(wxEVT_SLIDER, &PanelSensor::OnSliderChanged, this);
+    mainWindow->Bind(wxEVT_MAXIMIZE, &PanelSensor::OnWindowMaximized, this);
+    mainWindow->Bind(wxEVT_FULLSCREEN, &PanelSensor::OnFullScreen, this);
 
     //Button Back
-    button_back = new wxButton(panel, wxID_ANY, "<--", wxPoint(10, 300), wxSize(100, 40));
+    button_back = new wxButton(panel, wxID_ANY, "<--", wxPoint(10, 10), wxSize(100, 40));
     button_back->Bind(wxEVT_BUTTON, &PanelSensor::ButtonBack_OnButtonClick, this);
+    
+    //Slider
+    slider = new wxSlider(panel, wxID_ANY, (PanelSensor::sliderMaxValue + PanelSensor::sliderMinValue) / 2, PanelSensor::sliderMinValue, PanelSensor::sliderMaxValue, wxPoint(120, 10), wxSize(300, -1), wxSL_HORIZONTAL);
+    slider->Bind(wxEVT_SLIDER, &PanelSensor::OnSliderChanged, this);
+
+    //rich text
+    richText = new wxRichTextCtrl(panel, wxID_ANY, "", wxPoint(10, 60), wxSize(512, 512), wxRE_MULTILINE | wxVSCROLL);
+    richText->Clear();
+    richText->SetEditable(false);
+    UpdateRichTextTransofrm();
 
     //fetch data
     panel->Bind(EVT_HTTP_FETCH_COMPLETE, &PanelSensor::OnDataFetched, this);
@@ -74,8 +36,11 @@ PanelSensor::PanelSensor(Panel* origin, std::string _sensorId) : Panel(origin){
 
 PanelSensor::~PanelSensor(){
     //destroy objects by pointers
-    slider->Destroy(); slider = nullptr;
     button_back->Destroy(); button_back = nullptr;
+    slider->Destroy(); slider = nullptr;
+    richText->Destroy(); richText = nullptr;
+
+    //chart
     if(chart != nullptr){
         chart->Destroy();
         chart = nullptr;
@@ -89,9 +54,25 @@ PanelSensor::~PanelSensor(){
 
 //================================================================
 
-void PanelSensor::OnWindowResized(wxSizeEvent& event){
+void PanelSensor::UpdateGUI(){
     UpdateChart();
+    UpdateRichTextTransofrm();
     mainWindow->Layout();
+}
+
+void PanelSensor::OnWindowResized(wxSizeEvent& event) {
+    UpdateGUI();
+    event.Skip();  // Let wxWidgets handle default behavior
+}
+
+void PanelSensor::OnWindowMaximized(wxMaximizeEvent& event) {
+    UpdateGUI();
+    event.Skip();
+}
+
+void PanelSensor::OnFullScreen(wxFullScreenEvent& event) {
+    UpdateGUI();
+    event.Skip();
 }
 
 //================================================================
@@ -138,8 +119,8 @@ void PanelSensor::OnDataFetched(wxThreadEvent& event){
         chartSum = 0;
         chartMinIndex = 0;
         chartMaxIndex = 0;
-        float y_min = std::numeric_limits<float>::min();
-        float y_max = std::numeric_limits<float>::max();
+        float y_min = std::numeric_limits<float>::max();
+        float y_max = std::numeric_limits<float>::min();
         float y = 0;
         while(count--){
             //check value
@@ -176,10 +157,56 @@ void PanelSensor::OnSliderChanged(wxCommandEvent& event){
 
 //================================================================
 
+void PanelSensor::UpdateRichTextText(){
+    //write message
+    std::string message = "";
+
+    //local chart
+    message += "\tWybrany okres";
+    message += "\nLiczba: " + std::to_string(chartLocalValidCount);
+    message += "\nSuma: " + std::to_string(chartLocalSum);
+    message += "\nSrednia: " + std::to_string(chartLocalSum / (float)chartLocalValidCount);
+    if(chartLocalMinIndex)
+        message += "\nMinimum: " + JSON_ParseAsString(data["values"][chartLocalMinIndex - 1], "value") + " dla " + JSON_ParseAsString(data["values"][chartLocalMinIndex - 1], "date");
+    if(chartLocalMaxIndex)
+        message += "\nMaximum: " + JSON_ParseAsString(data["values"][chartLocalMaxIndex - 1], "value") + " dla " + JSON_ParseAsString(data["values"][chartLocalMaxIndex - 1], "date");
+
+    //space
+    message += "\n\n";
+
+    //whole chart
+    message += "\tCały okres";
+    message += "\nLiczba: " + std::to_string(chartValidCount);
+    message += "\nSuma: " + std::to_string(chartSum);
+    message += "\nSrednia: " + std::to_string(chartSum / (float)chartValidCount);
+    if(chartMinIndex)
+        message += "\nMinimum: " + JSON_ParseAsString(data["values"][chartMinIndex - 1], "value") + " dla " + JSON_ParseAsString(data["values"][chartMinIndex - 1], "date");
+    if(chartMaxIndex)
+        message += "\nMaximum: " + JSON_ParseAsString(data["values"][chartMaxIndex - 1], "value") + " dla " + JSON_ParseAsString(data["values"][chartMaxIndex - 1], "date");
+    
+    //write
+    richText->Clear();
+    richText->WriteText(wxString::FromUTF8(message));
+}
+
+void PanelSensor::UpdateRichTextTransofrm(){
+    wxSize newSize = panel->GetClientSize();
+
+    //position
+    richText->SetPosition(wxPoint(10, newSize.GetHeight() - 200 - 10));
+
+    //size
+    newSize.SetWidth(newSize.GetWidth() - 10);
+    newSize.SetHeight(200);
+    richText->SetSize(newSize);
+}
+
+//================================================================
+
 void PanelSensor::UpdateChartSize(){
-    wxSize newSize = mainWindow->GetSize();
-    newSize.SetWidth(newSize.GetWidth() - 60);
-    newSize.SetHeight(newSize.GetHeight() - 60);
+    wxSize newSize = panel->GetClientSize();
+    newSize.SetWidth(newSize.GetWidth() - 10);
+    newSize.SetHeight(richText->GetPosition().y - chart->GetPosition().y - 10);
     chart->SetSize(newSize);
 }
 
@@ -219,8 +246,8 @@ void PanelSensor::UpdateChart(){
     chartLocalSum = 0;
     chartLocalMinIndex = 0;
     chartLocalMaxIndex = 0;
-    float y_min = std::numeric_limits<float>::min();
-    float y_max = std::numeric_limits<float>::max();
+    float y_min = std::numeric_limits<float>::max();
+    float y_max = std::numeric_limits<float>::min();
 
     //add items
     wxVector<wxString> labels;
@@ -321,8 +348,11 @@ void PanelSensor::UpdateChart(){
     options.GetCommonOptions().SetShowTooltips(false);
     //options.GetGridOptions().SetShowGridLines(false);
     //
-    chart = new wxLineChartCtrl(panel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, options, wxPoint(10, 30), wxSize(610, 410), wxBORDER_NONE);
+    chart = new wxLineChartCtrl(panel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, options, wxPoint(10, 60), wxSize(100, 100), wxBORDER_NONE);
     UpdateChartSize();
+
+    //update richText
+    UpdateRichTextText();
 }
 
 //================================================================
