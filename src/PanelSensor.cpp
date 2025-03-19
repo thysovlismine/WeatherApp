@@ -117,7 +117,21 @@ void PanelSensor::OnDataFetched(wxThreadEvent& event){
     
     //get data
     LocalDB::LoadSensor(data, sensorId);
-    
+
+    //update slider
+    {
+        //check data params
+        if(!data.contains("values"))
+            return;
+        if(!data["values"].is_array())
+            return;
+
+        //update slider
+        slider->SetMin(0);
+        slider->SetMax(data["values"].size());
+        slider->SetValue(std::max(slider->GetMax() - PanelSensor::startingValueCount, slider->GetMin()));
+    }
+
     //Update chart
     UpdateChart();
 }
@@ -146,18 +160,32 @@ void PanelSensor::UpdateChart(){
 
     //get range
     size_t count = data["values"].size();
-    size_t i = count * ((float)(slider->GetValue() - PanelSensor::sliderMinValue) / (float)(PanelSensor::sliderMaxValue - PanelSensor::sliderMinValue));
+    size_t i = count * ((float)(slider->GetValue() - slider->GetMin()) / (float)(slider->GetMax() - slider->GetMin()));
 
     //check if it is neccessery to render
     if(chartLastStartIndex == i)
         return;
     chartLastStartIndex = i;
 
+    //skip i=count
+    if(i == count)
+        return;
+
     //destroy chart
     if(chart != nullptr){
         chart->Destroy();
         chart = nullptr;
     }
+    //init text calculation
+    wxClientDC dc(panel); // Create a device context (DC)
+    dc.SetFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+    int labelTextWidth, labelTextHeight;
+
+    //step size
+    const int labelStepSize = ((mainWindow->GetSize().GetWidth() - 0) - 0) / (count - i);
+
+    //distance
+    int labelDistance = 99999;
 
     //add items
     wxVector<wxString> labels;
@@ -168,6 +196,22 @@ void PanelSensor::UpdateChart(){
         //get ppint
         x = JSON_ParseString(data["values"][i], "date");
         y = JSON_ParseNumber(data["values"][i], "value");
+        
+        //get text size
+        dc.GetTextExtent(wxString::FromUTF8(x), &labelTextWidth, &labelTextHeight);
+        labelTextWidth /= 2;
+
+        //make a step
+        labelDistance += labelStepSize;        
+        if(labelDistance > labelTextWidth){
+            //take space and let the text be displayed
+            labelDistance = -labelTextWidth;
+        }
+        else{
+            //don't take space and skip rendering this text
+            x = "";
+        }
+
         //add points
         labels.push_back(x);
         points.push_back(y);

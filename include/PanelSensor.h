@@ -29,6 +29,7 @@ class PanelSensor : public Panel{
     void OnSliderChanged(wxCommandEvent& event);
     const int sliderMinValue = 0;
     const int sliderMaxValue = 1000;
+    const int startingValueCount = 24;
 
     //chart
     nlohmann::json data;
