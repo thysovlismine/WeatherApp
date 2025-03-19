@@ -13,6 +13,8 @@ std::string JSON_ParseString(const nlohmann::json& item);
 std::string JSON_ParseString(const nlohmann::json& item, const std::string keyName);
 std::string JSON_ParseAsString(const nlohmann::json& item);
 std::string JSON_ParseAsString(const nlohmann::json& item, const std::string keyName);
+bool JSON_isNumber(const nlohmann::json& item);
+bool JSON_isNumber(const nlohmann::json& item, const std::string keyName);
 
 bool JSON_FromFile(nlohmann::json& data, std::string targetFile);
 bool JSON_ToFile(nlohmann::json& data, std::string targetFile);

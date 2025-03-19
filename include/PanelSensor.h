@@ -31,11 +31,25 @@ class PanelSensor : public Panel{
     const int sliderMaxValue = 1000;
     const int startingValueCount = 24;
 
+    //info bar
+
     //chart
     nlohmann::json data;
     wxLineChartCtrl* chart = nullptr;
     void UpdateChart();
     void UpdateChartSize();
+
+    //chart info
+    int chartValidCount;
+    float chartSum;
+    size_t chartMinIndex;
+    size_t chartMaxIndex;
+
+    //current chart info
+    int chartLocalValidCount;
+    float chartLocalSum;
+    size_t chartLocalMinIndex;
+    size_t chartLocalMaxIndex;
 
     //Button Back
     wxButton* button_back;

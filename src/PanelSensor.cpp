@@ -2,6 +2,7 @@
 #include "JSONTools.h"
 #include <wx/colour.h>
 #include <wx/charts/wxlinechartdatasetoptions.h>
+#include <limits>
 
 //================================================================
 
@@ -118,7 +119,7 @@ void PanelSensor::OnDataFetched(wxThreadEvent& event){
     //get data
     LocalDB::LoadSensor(data, sensorId);
 
-    //update slider
+    //update main data
     {
         //check data params
         if(!data.contains("values"))
@@ -130,6 +131,37 @@ void PanelSensor::OnDataFetched(wxThreadEvent& event){
         slider->SetMin(0);
         slider->SetMax(data["values"].size());
         slider->SetValue(std::max(slider->GetMax() - PanelSensor::startingValueCount, slider->GetMin()));
+
+        //make local stats
+        size_t count = data["values"].size();
+        chartValidCount = 0;
+        chartSum = 0;
+        chartMinIndex = 0;
+        chartMaxIndex = 0;
+        float y_min = std::numeric_limits<float>::min();
+        float y_max = std::numeric_limits<float>::max();
+        float y = 0;
+        while(count--){
+            //check value
+            if(!JSON_isNumber(data["values"][count], "value"))
+                continue;
+            //parse
+            y = JSON_ParseNumber(data["values"][count], "value");
+            //sum
+            chartSum += y;
+            //min
+            if(y < y_min){
+                chartMinIndex = count + 1;
+                y_min = y;
+            }
+            //max
+            if(y > y_max){
+                chartMaxIndex = count + 1;
+                y_max = y;
+            }
+            //count
+            chartValidCount++;
+        }
     }
 
     //Update chart
@@ -182,6 +214,14 @@ void PanelSensor::UpdateChart(){
     //distance
     int labelDistance = INT_MAX - labelStepSize;
 
+    //make local stats
+    chartLocalValidCount = 0;
+    chartLocalSum = 0;
+    chartLocalMinIndex = 0;
+    chartLocalMaxIndex = 0;
+    float y_min = std::numeric_limits<float>::min();
+    float y_max = std::numeric_limits<float>::max();
+
     //add items
     wxVector<wxString> labels;
     wxVector<wxDouble> points;
@@ -202,6 +242,24 @@ void PanelSensor::UpdateChart(){
         //get point
         x = JSON_ParseString(data["values"][i], "date");
         y = JSON_ParseNumber(data["values"][i], "value");
+        
+        //local stats
+        if(JSON_isNumber(data["values"][i], "value")){
+            //sum
+            chartLocalSum += y;
+            //min
+            if(y < y_min){
+                chartLocalMinIndex = i + 1;
+                y_min = y;
+            }
+            //max
+            if(y > y_max){
+                chartLocalMaxIndex = i + 1;
+                y_max = y;
+            }
+            //count
+            chartLocalValidCount++;
+        }
         
         //correct label name
         if(parseDateTime(x, time)){

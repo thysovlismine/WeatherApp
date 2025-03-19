@@ -98,6 +98,29 @@ bool JSON_ToFile(nlohmann::json& data, std::string targetFile){
     return false;
 }
 
+bool JSON_isNumber(const nlohmann::json& item){
+    try{
+        float a = item.get<float>();
+    }
+    catch(const std::exception&){
+        return false;
+    }
+    return true;
+}
+
+bool JSON_isNumber(const nlohmann::json& item, const std::string keyName){
+    try{
+        if(item.contains(keyName)){
+            float a = item[keyName].get<float>();
+        }
+        else
+            return false;
+    }
+    catch(const std::exception&){
+        return false;
+    }
+    return true;
+}
 
 //by ChatGPT
 void JSON_Unique(nlohmann::json& jsonArray, const std::string& key) {
