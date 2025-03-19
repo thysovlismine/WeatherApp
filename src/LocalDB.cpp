@@ -51,19 +51,11 @@ void UpdateGeneral(std::string data, std::string targetFile, std::string uniqueK
             return;
 
         //load file
-        std::ifstream inFile(targetFile);
-        if(inFile){
-            //parse json
-            inFile >> present;  // Deserialize JSON data
-            inFile.close();
-        }
-        else{
+        if(!JSON_FromFile(present, targetFile)){
             //just make an empty array
             //present = nlohmann::json::array();
             //or skip processing part and save fetched to index.json
-            std::ofstream outFile(targetFile);
-            outFile << fetched.dump(4);
-            outFile.close();
+            JSON_ToFile(fetched, targetFile);
             return;
         }
     }
@@ -83,13 +75,7 @@ void UpdateGeneral(std::string data, std::string targetFile, std::string uniqueK
     }
     
     //save the updated json
-    try{
-        //save present to file
-        std::ofstream outFile(targetFile);
-        outFile << present.dump(4);
-        outFile.close();
-    }
-    catch(const std::exception&){
+    if(!JSON_ToFile(present, targetFile)){
         //error
         wxMessageBox("Error on UpdateGeneral at saving part!!!!");
     }
@@ -102,7 +88,6 @@ void LocalDB::UpdateIndex(std::string data){
 void LocalDB::UpdateStation(std::string stationId, std::string data){
     UpdateGeneral(data, "station_" + stationId + ".json", "id");
 }
-
 
 void LocalDB::UpdateSensor(std::string sensorId, std::string data){
     //target file
@@ -135,20 +120,12 @@ void LocalDB::UpdateSensor(std::string sensorId, std::string data){
             }), fetched["values"].end());
         
         //load file
-        std::ifstream inFile(targetFile);
-        if(inFile){
-            //parse json
-            inFile >> present;  // Deserialize JSON data
-            inFile.close();
-        }
-        else{
+        if(!JSON_FromFile(present, targetFile)){
             //sort fetched
             JSON_SortByDate(fetched["values"]);
 
             //save fetched to the target file
-            std::ofstream outFile(targetFile);
-            outFile << fetched.dump(4);
-            outFile.close();
+            JSON_ToFile(fetched, targetFile);
             return;
         }
     }
@@ -165,184 +142,21 @@ void LocalDB::UpdateSensor(std::string sensorId, std::string data){
     JSON_SortByDate(present["values"]);
 
     //save the updated json
-    try{
-        //save present to file
-        std::ofstream outFile(targetFile);
-        outFile << present.dump(4);
-        outFile.close();
-    }
-    catch(const std::exception&){
+    if(!JSON_ToFile(present, targetFile)){
         //error
         wxMessageBox("Error on UpdateSensor at saving part!!!!");
     }
 }
 
-/*
-std::vector<StationIndexInfo> LocalDB::LoadIndex(){
-    //load json
-    nlohmann::json present;
-
-    //prepare json
-    try{
-        //load file
-        std::ifstream inFile("index.json");
-        if(inFile){
-            //parse json
-            inFile >> present;  // Deserialize JSON data
-            inFile.close();
-        }
-        else{
-            //error
-            wxMessageBox("Error on LoadIndex (File doesn't exist)!!!!");
-            return std::vector<StationIndexInfo>();
-        }
-    }
-    catch(const std::exception&){
-        //error
-        wxMessageBox("Error on LoadIndex!!!!");
-        return std::vector<StationIndexInfo>();
-    }
-
-    //check count
-    size_t count = present.size();
-    if(count <= 0)
-        return std::vector<StationIndexInfo>();
-    
-    //write data
-    std::vector<StationIndexInfo> data(count);
-    while(count--){
-        //check required fields
-        if(present[count].contains("id") && present[count].contains("stationName")){
-            //keep data
-            data[count].id = JSON_ParseAsString(present[count]["id"]);            
-            data[count].name = JSON_ParseString(present[count]["stationName"]);
-        }
-    }
-
-    //return
-    return data;
-}
-*/
-
-bool LoadJSON(nlohmann::json& data, std::string targetFile){
-    try{
-        std::ifstream inFile(targetFile);
-        if(inFile){
-            //parse json
-            inFile >> data;  // Deserialize JSON data
-            inFile.close();
-            //load was successful
-            return true;
-        }
-    }
-    catch(const std::exception&){
-        //do nothing
-    }
-    //couldn't load file
-    return false;
-}
 
 bool LocalDB::LoadIndex(nlohmann::json& data){
-    return LoadJSON(data, "index.json");
+    return JSON_FromFile(data, "index.json");
 }
-
-/*
-std::vector<SensorIndexInfo> LocalDB::LoadStation(std::string stationId){
-    //load json
-    nlohmann::json present;
-
-    //prepare json
-    try{
-        //load file
-        std::ifstream inFile("station_" + stationId + ".json");
-        if(inFile){
-            //parse json
-            inFile >> present;  // Deserialize JSON data
-            inFile.close();
-        }
-        else{
-            //error
-            wxMessageBox("Error on LoadStation (File doesn't exist)!!!!");
-            return std::vector<SensorIndexInfo>();
-        }
-    }
-    catch(const std::exception&){
-        //error
-        wxMessageBox("Error on LoadStation!!!!");
-        return std::vector<SensorIndexInfo>();
-    }
-
-    //check count
-    size_t count = present.size();
-    if(count <= 0)
-        return std::vector<SensorIndexInfo>();
-    
-    //write data
-    std::vector<SensorIndexInfo> data(count);
-    while(count--){
-        //check requierd fields
-        if(present[count].contains("id") && present[count].contains("param"))
-            if(present[count]["param"].contains("paramName")){
-                //add
-                data[count].id = JSON_ParseAsString(present[count]["id"]);            
-                data[count].name = JSON_ParseString(present[count]["param"]["paramName"]);
-            }
-    }
-
-    //return
-    return data;
-}
-*/
 
 bool LocalDB::LoadStation(nlohmann::json& data, std::string stationId){
-    return LoadJSON(data, "station_" + stationId + ".json");
+    return JSON_FromFile(data, "station_" + stationId + ".json");
 }
 
-std::vector<SensorData> LocalDB::LoadSensor(std::string sensorId){
-    //load json
-    nlohmann::json present;
-
-    //prepare json
-    try{
-        //load file
-        std::ifstream inFile("sensor_" + sensorId + ".json");
-        if(inFile){
-            //parse json
-            inFile >> present;  // Deserialize JSON data
-            inFile.close();
-        }
-        else{
-            //error
-            wxMessageBox("Error on LoadSensor (File doesn't exist)!!!!");
-            return std::vector<SensorData>();
-        }
-    }
-    catch(const std::exception&){
-        //error
-        wxMessageBox("Error on LoadSensor!!!!");
-        return std::vector<SensorData>();
-    }
-
-    //scope to values
-    present = present["values"];
-
-    //check count
-    size_t count = present.size();
-    if(count <= 0)
-        return std::vector<SensorData>();
-    
-    //write data
-    std::vector<SensorData> data(count);
-    while(count--){
-        //check requierd fields
-        if(present[count].contains("value") && present[count].contains("date")){
-            //add
-            data[count].value = JSON_ParseNumber(present[count]["value"]);            
-            data[count].date = JSON_ParseString(present[count]["date"]);
-        }
-    }
-
-    //return
-    return data;
+bool LocalDB::LoadSensor(nlohmann::json& data, std::string sensorId){
+    return JSON_FromFile(data, "sensor_" + sensorId + ".json");
 }
-

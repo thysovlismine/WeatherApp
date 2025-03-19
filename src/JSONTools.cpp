@@ -1,6 +1,7 @@
 #include "JSONTools.h"
 #include <algorithm>
 #include <unordered_set>
+#include <fstream>
 
 float JSON_ParseNumber(const nlohmann::json& item) {
     try{
@@ -60,6 +61,40 @@ std::string JSON_ParseAsString(const nlohmann::json& item, const std::string key
     catch(const std::exception&){
         return 0;
     }
+}
+
+bool JSON_FromFile(nlohmann::json& data, std::string targetFile){
+    try{
+        std::ifstream inFile(targetFile);
+        if(inFile){
+            //parse json
+            inFile >> data;  // Deserialize JSON data
+            inFile.close();
+            //load was successful
+            return true;
+        }
+    }
+    catch(const std::exception&){
+        //do nothing
+    }
+    //couldn't load file
+    return false;
+}
+
+bool JSON_ToFile(nlohmann::json& data, std::string targetFile){
+    try{
+        //save present to file
+        std::ofstream outFile(targetFile);
+        outFile << data.dump(4);
+        outFile.close();
+        //save was successful
+        return true;
+    }
+    catch(const std::exception&){
+        //do nothing
+    }
+    //couldn't save the file
+    return false;
 }
 
 

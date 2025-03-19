@@ -14,6 +14,9 @@ std::string JSON_ParseString(const nlohmann::json& item, const std::string keyNa
 std::string JSON_ParseAsString(const nlohmann::json& item);
 std::string JSON_ParseAsString(const nlohmann::json& item, const std::string keyName);
 
+bool JSON_FromFile(nlohmann::json& data, std::string targetFile);
+bool JSON_ToFile(nlohmann::json& data, std::string targetFile);
+
 void JSON_Unique(nlohmann::json& jsonArray, const std::string& key);
 
 size_t JSON_Find(const std::string& keyValueDumped, const std::string& keyName, const nlohmann::json& arr);

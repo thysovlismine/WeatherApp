@@ -1,4 +1,5 @@
 #include "PanelSensor.h"
+#include "JSONTools.h"
 #include <wx/colour.h>
 #include <wx/charts/wxlinechartdatasetoptions.h>
 
@@ -115,7 +116,7 @@ void PanelSensor::OnDataFetched(wxThreadEvent& event){
     LocalDB::UpdateSensor(sensorId, response);
     
     //get data
-    data = LocalDB::LoadSensor(sensorId);
+    LocalDB::LoadSensor(data, sensorId);
     
     //Update chart
     UpdateChart();
@@ -137,8 +138,14 @@ void PanelSensor::UpdateChartSize(){
 }
 
 void PanelSensor::UpdateChart(){
+    //check data params
+    if(!data.contains("values"))
+        return;
+    if(!data["values"].is_array())
+        return;
+
     //get range
-    size_t count = data.size();
+    size_t count = data["values"].size();
     size_t i = count * ((float)(slider->GetValue() - PanelSensor::sliderMinValue) / (float)(PanelSensor::sliderMaxValue - PanelSensor::sliderMinValue));
 
     //check if it is neccessery to render
@@ -155,11 +162,15 @@ void PanelSensor::UpdateChart(){
     //add items
     wxVector<wxString> labels;
     wxVector<wxDouble> points;
+    float y;
+    std::string x;
     for(; i < count; i++){
-        labels.push_back(data[i].date.substr(11));
-        points.push_back(data[i].value);
-        //if(i==10)
-        //    break;
+        //get ppint
+        x = JSON_ParseString(data["values"][i], "date");
+        y = JSON_ParseNumber(data["values"][i], "value");
+        //add points
+        labels.push_back(x);
+        points.push_back(y);
     }
     
     //labels

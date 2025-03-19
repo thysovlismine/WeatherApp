@@ -31,7 +31,7 @@ class PanelSensor : public Panel{
     const int sliderMaxValue = 1000;
 
     //chart
-    std::vector<SensorData> data;
+    nlohmann::json data;
     wxLineChartCtrl* chart = nullptr;
     size_t chartLastStartIndex = 0;
     void UpdateChart();
