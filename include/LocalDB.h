@@ -8,16 +8,6 @@
 
 //fetching more specific data about the station or sensor is a part of a additional info functions (they don't play a key in processing the data)
 
-struct StationIndexInfo{
-    std::string id;
-    std::string name;
-};
-
-struct SensorIndexInfo{
-    std::string id;
-    std::string name;
-};
-
 struct SensorData{
     float value;
     std::string date;
@@ -32,11 +22,11 @@ class LocalDB{
     static void UpdateSensor(std::string sensorId, std::string data);
 
     //Data loading
-    static std::vector<SensorIndexInfo> LoadStation(std::string stationId);
     static std::vector<SensorData> LoadSensor(std::string sensorId);
     
     //Data loading JSON
     static bool LoadIndex(nlohmann::json& data);
+    static bool LoadStation(nlohmann::json& data, std::string stationId);
     
 
 };

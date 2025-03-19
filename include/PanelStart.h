@@ -17,7 +17,6 @@ class PanelStart : public Panel{
     wxStaticText* textTop = nullptr;
     
     //List
-    //std::vector<StationIndexInfo> data;
     nlohmann::json data;
     wxListBox* listStations;
     void ListStations_OnItemDoubleClicked(wxCommandEvent& event);

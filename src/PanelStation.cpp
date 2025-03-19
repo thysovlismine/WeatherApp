@@ -1,5 +1,6 @@
 #include "PanelStation.h"
 #include "PanelSensor.h"
+#include "JSONTools.h"
 
 //================================================================
 
@@ -70,14 +71,29 @@ void PanelStation::OnDataFetched(wxThreadEvent& event){
         LocalDB::UpdateStation(stationId, response);
     }
 
-    //get data from the DB
-    data = LocalDB::LoadStation(stationId);
-    size_t count = data.size();
-    
-    //add items
+    //clear list
     listSensors->Clear();
-    for(size_t i = 0; i < count; i++)
-        listSensors->Append(wxString::FromUTF8(data[i].name));
+
+    //get data from the DB
+    if(LocalDB::LoadStation(data, stationId)){
+        size_t count = data.size();
+        std::string name;
+
+        //add items
+        for(size_t i = 0; i < count; i++){
+            //get name
+            name = JSON_ParseString(data[i]["param"], "paramName");
+            //correct weird name
+            if(name.length() <= 0)
+                name = "Untitled (" + JSON_ParseAsString(data[i], "id") + ")";
+            //add name
+            listSensors->Append(wxString::FromUTF8(name));
+        }
+    }
+    else{
+        //Load failed
+
+    }
 }
 
 //================================================================
@@ -85,10 +101,10 @@ void PanelStation::OnDataFetched(wxThreadEvent& event){
 void PanelStation::ListSensors_OnItemDoubleClicked(wxCommandEvent& event){
     int index = listSensors->GetSelection();
     if (index != wxNOT_FOUND) {
-        new PanelSensor(this, data[index].id);
+        std::string id = JSON_ParseAsString(data[index], "id");
+        new PanelSensor(this, id);
     }
 }
-
 
 //================================================================
 

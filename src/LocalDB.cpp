@@ -246,6 +246,7 @@ bool LocalDB::LoadIndex(nlohmann::json& data){
     return LoadJSON(data, "index.json");
 }
 
+/*
 std::vector<SensorIndexInfo> LocalDB::LoadStation(std::string stationId){
     //load json
     nlohmann::json present;
@@ -290,6 +291,11 @@ std::vector<SensorIndexInfo> LocalDB::LoadStation(std::string stationId){
 
     //return
     return data;
+}
+*/
+
+bool LocalDB::LoadStation(nlohmann::json& data, std::string stationId){
+    return LoadJSON(data, "station_" + stationId + ".json");
 }
 
 std::vector<SensorData> LocalDB::LoadSensor(std::string sensorId){

@@ -20,7 +20,7 @@ class PanelStation : public Panel{
     wxStaticText* textTop;
 
     //List
-    std::vector<SensorIndexInfo> data;
+    nlohmann::json data;
     wxListBox* listSensors;
     void ListSensors_OnItemDoubleClicked(wxCommandEvent& event);
 
