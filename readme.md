@@ -25,7 +25,7 @@ cmake .. -DCMAKE_TOOLCHAIN_FILE=@@@VCPKPG_CMAKE_PATH_HERE@@@ -DCMAKE_BUILD_TYPE=
 cmake --build . --config Release
 ```
 
-The compiled app should be in `build/Release/app.exe`. On my Ubuntu, it's straight in 'build/app`.
+The compiled app should be in `build/Release/app.exe`. On my Ubuntu, it's straight in `build/app`.
 
 ## TODO:
 
