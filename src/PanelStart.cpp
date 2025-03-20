@@ -9,11 +9,16 @@ PanelStart::PanelStart() : Panel(nullptr), httpFetcher(nullptr){
     //window
     SetTitle("Lista Stacji");
 
+    //window events
+    mainWindow->Bind(wxEVT_SIZE, &PanelStart::OnWindowResized, this);
+    mainWindow->Bind(wxEVT_MAXIMIZE, &PanelStart::OnWindowMaximized, this);
+    mainWindow->Bind(wxEVT_FULLSCREEN, &PanelStart::OnFullScreen, this);
+
     //Text top
-    textTop = new wxStaticText(panel, wxID_ANY, "Wybierz Stacje Pomiarowa", wxPoint(10, 10));
+    textTop = new wxStaticText(panel, wxID_ANY, "Wybierz Stacje Pomiarowa", wxPoint(styleObjectSpacingX, styleObjectSpacingY));
 
     //List Stations
-    listStations = new wxListBox(panel, wxID_ANY, wxPoint(10, 30), wxSize(400, 250));
+    listStations = new wxListBox(panel, wxID_ANY, wxPoint(styleObjectSpacingX, textTop->GetPosition().y + textTop->GetSize().GetHeight() + styleObjectSpacingY), wxSize(400, 250));
     listStations->Bind(wxEVT_LISTBOX_DCLICK, &PanelStart::ListStations_OnItemDoubleClicked, this);
 
     //Button About
@@ -23,13 +28,22 @@ PanelStart::PanelStart() : Panel(nullptr), httpFetcher(nullptr){
     //Load and Update data
     panel->Bind(EVT_HTTP_FETCH_COMPLETE, &PanelStart::OnDataFetched, this);
     FetchList();
+
+    //update Gui
+    UpdateGUI();
 }
 
 PanelStart::~PanelStart(){
+    //Unbind window events (to avoid operation on null)
+    mainWindow->Unbind(wxEVT_SIZE, &PanelStart::OnWindowResized, this);
+    mainWindow->Unbind(wxEVT_MAXIMIZE, &PanelStart::OnWindowMaximized, this);
+    mainWindow->Unbind(wxEVT_FULLSCREEN, &PanelStart::OnFullScreen, this);
+
     //destroy objects by pointers
     textTop->Destroy(); textTop = nullptr;
     listStations->Destroy(); listStations = nullptr;
     button_about->Destroy(); button_about = nullptr;
+
     //Destroy HttpFetcher
     if(httpFetcher != nullptr){
         httpFetcher->Destroy();
@@ -89,6 +103,33 @@ void PanelStart::OnDataFetched(wxThreadEvent& event){
 
     }
 }
+
+//================================================================
+
+void PanelStart::UpdateGUI(){
+    //update listSensors
+    wxSize screenSize = mainWindow->GetClientSize();
+    listStations->SetSize(screenSize.GetWidth() - 2 * styleObjectSpacingX, screenSize.GetHeight() - listStations->GetPosition().y - styleObjectSpacingY);
+
+    //rest
+    mainWindow->Layout();
+}
+
+void PanelStart::OnWindowResized(wxSizeEvent& event) {
+    UpdateGUI();
+    event.Skip();  // Let wxWidgets handle default behavior
+}
+
+void PanelStart::OnWindowMaximized(wxMaximizeEvent& event) {
+    UpdateGUI();
+    event.Skip();
+}
+
+void PanelStart::OnFullScreen(wxFullScreenEvent& event) {
+    UpdateGUI();
+    event.Skip();
+}
+
 
 //================================================================
 

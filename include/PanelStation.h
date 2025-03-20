@@ -20,6 +20,10 @@ class PanelStation : public Panel{
     void FetchParams();
     HttpFetcher* httpFetcher = nullptr;
     void OnDataFetched(wxThreadEvent& event);
+    void UpdateGUI();
+    void OnWindowResized(wxSizeEvent& event);
+    void OnWindowMaximized(wxMaximizeEvent& event);
+    void OnFullScreen(wxFullScreenEvent& event);
 
     //Text top
     wxStaticText* textTop;

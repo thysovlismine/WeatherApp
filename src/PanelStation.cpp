@@ -11,6 +11,11 @@ PanelStation::PanelStation(Panel* origin, std::string _stationId, std::string _s
 
     //window
     SetTitle("Stacja: " + _stationName);
+
+    //window events
+    mainWindow->Bind(wxEVT_SIZE, &PanelStation::OnWindowResized, this);
+    mainWindow->Bind(wxEVT_MAXIMIZE, &PanelStation::OnWindowMaximized, this);
+    mainWindow->Bind(wxEVT_FULLSCREEN, &PanelStation::OnFullScreen, this);
     
     //Button Back
     button_back = new wxButton(panel, wxID_ANY, "<--", wxPoint(styleObjectSpacingX, styleObjectSpacingY), wxSize(100, 40));
@@ -23,19 +28,25 @@ PanelStation::PanelStation(Panel* origin, std::string _stationId, std::string _s
     listSensors = new wxListBox(panel, wxID_ANY, wxPoint(styleObjectSpacingX, textTop->GetPosition().y + textTop->GetSize().GetHeight() + styleObjectSpacingY), wxSize(400, 250));
     listSensors->Bind(wxEVT_LISTBOX_DCLICK, &PanelStation::ListSensors_OnItemDoubleClicked, this);
 
-    
-
     //fetch info
     panel->Bind(EVT_HTTP_FETCH_COMPLETE, &PanelStation::OnDataFetched, this);
     FetchParams();
-    
+
+    //update gui
+    UpdateGUI();
 }
 
 PanelStation::~PanelStation(){
+    //Unbind window events (to avoid operation on null)
+    mainWindow->Unbind(wxEVT_SIZE, &PanelStation::OnWindowResized, this);
+    mainWindow->Unbind(wxEVT_MAXIMIZE, &PanelStation::OnWindowMaximized, this);
+    mainWindow->Unbind(wxEVT_FULLSCREEN, &PanelStation::OnFullScreen, this);
+
     //destroy objects by pointers
     textTop->Destroy(); textTop = nullptr;
     listSensors->Destroy(); listSensors = nullptr;
     button_back->Destroy(); button_back = nullptr;
+
     //Destroy HttpFetcher
     if(httpFetcher != nullptr){
         httpFetcher->Destroy();
@@ -94,6 +105,32 @@ void PanelStation::OnDataFetched(wxThreadEvent& event){
         //Load failed
 
     }
+}
+
+//================================================================
+
+void PanelStation::UpdateGUI(){
+    //update listSensors
+    wxSize screenSize = mainWindow->GetClientSize();
+    listSensors->SetSize(screenSize.GetWidth() - 2 * styleObjectSpacingX, screenSize.GetHeight() - listSensors->GetPosition().y - styleObjectSpacingY);
+
+    //rest
+    mainWindow->Layout();
+}
+
+void PanelStation::OnWindowResized(wxSizeEvent& event) {
+    UpdateGUI();
+    event.Skip();  // Let wxWidgets handle default behavior
+}
+
+void PanelStation::OnWindowMaximized(wxMaximizeEvent& event) {
+    UpdateGUI();
+    event.Skip();
+}
+
+void PanelStation::OnFullScreen(wxFullScreenEvent& event) {
+    UpdateGUI();
+    event.Skip();
 }
 
 //================================================================

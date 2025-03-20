@@ -8,10 +8,18 @@ class PanelStart : public Panel{
     PanelStart();
     ~PanelStart();
 
+    //style config
+    const int styleObjectSpacingX = 10;
+    const int styleObjectSpacingY = 10;
+
     //funcs
     void FetchList();
     HttpFetcher* httpFetcher = nullptr;
     void OnDataFetched(wxThreadEvent& event);
+    void UpdateGUI();
+    void OnWindowResized(wxSizeEvent& event);
+    void OnWindowMaximized(wxMaximizeEvent& event);
+    void OnFullScreen(wxFullScreenEvent& event);
 
     //Text top
     wxStaticText* textTop = nullptr;
