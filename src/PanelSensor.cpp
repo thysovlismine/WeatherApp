@@ -162,12 +162,32 @@ void PanelSensor::OnDataFetched(wxThreadEvent& event){
         //whole chart
         message += "\tCały okres";
         message += "\nLiczba: " + std::to_string(chartValidCount);
-        message += "\nSuma: " + std::to_string(chartSum);
-        message += "\nSrednia: " + std::to_string(chartSum / (float)chartValidCount);
+        if(chartValidCount)
+            message += "\nSuma: " + std::to_string(chartSum);
+        if(chartValidCount)
+            message += "\nSrednia: " + std::to_string(chartSum / (float)chartValidCount);
         if(chartMinIndex)
             message += "\nMinimum: " + JSON_ParseAsString(data["values"][chartMinIndex - 1], "value") + " dla " + JSON_ParseAsString(data["values"][chartMinIndex - 1], "date");
         if(chartMaxIndex)
             message += "\nMaximum: " + JSON_ParseAsString(data["values"][chartMaxIndex - 1], "value") + " dla " + JSON_ParseAsString(data["values"][chartMaxIndex - 1], "date");
+        //Standard deviation
+        if(chartValidCount){
+            count = data["values"].size();
+            float avg = chartSum / (float)chartValidCount;
+            chartStandardDeviationSum = 0;
+            while(count--){
+                //check value
+                if(!JSON_isNumber(data["values"][count], "value"))
+                    continue;
+                //parse
+                    y = JSON_ParseNumber(data["values"][count], "value");
+                //add to d_sum
+                chartStandardDeviationSum += (float)pow((double)(y - avg), (double)(2));
+            }
+            //write
+            message += "\nOdchylenie Standardowe: " + std::to_string(sqrt((double)(chartStandardDeviationSum / (float)chartValidCount)));
+        }
+
         //write
         summery2->Clear();
         summery2->WriteText(wxString::FromUTF8(message));
@@ -192,12 +212,16 @@ void PanelSensor::UpdateSummery1Text(){
     //local chart
     message += "\tWybrany okres";
     message += "\nLiczba: " + std::to_string(chartLocalValidCount);
-    message += "\nSuma: " + std::to_string(chartLocalSum);
-    message += "\nSrednia: " + std::to_string(chartLocalSum / (float)chartLocalValidCount);
+    if(chartLocalValidCount)
+        message += "\nSuma: " + std::to_string(chartLocalSum);
+    if(chartLocalValidCount)
+        message += "\nSrednia: " + std::to_string(chartLocalSum / (float)chartLocalValidCount);
     if(chartLocalMinIndex)
         message += "\nMinimum: " + JSON_ParseAsString(data["values"][chartLocalMinIndex - 1], "value") + " dla " + JSON_ParseAsString(data["values"][chartLocalMinIndex - 1], "date");
     if(chartLocalMaxIndex)
         message += "\nMaximum: " + JSON_ParseAsString(data["values"][chartLocalMaxIndex - 1], "value") + " dla " + JSON_ParseAsString(data["values"][chartLocalMaxIndex - 1], "date");
+    if(chartLocalValidCount)
+        message += "\nOdchylenie Standardowe: " + std::to_string(sqrt((double)(chartLocalStandardDeviationSum / (float)chartLocalValidCount)));
 
     //write
     summery1->Clear();
@@ -234,11 +258,11 @@ void PanelSensor::UpdateChart(){
         return;
 
     //get range
-    size_t count = data["values"].size();
-    size_t i = count * ((float)(slider->GetValue() - slider->GetMin()) / (float)(slider->GetMax() - slider->GetMin()));
+    const size_t count = data["values"].size();
+    const size_t start = count * ((float)(slider->GetValue() - slider->GetMin()) / (float)(slider->GetMax() - slider->GetMin()));
 
     //skip i=count
-    if(i == count)
+    if(start == count)
         return;
 
     //destroy chart
@@ -252,7 +276,7 @@ void PanelSensor::UpdateChart(){
     int labelTextWidth, labelTextHeight;
 
     //step size
-    const int labelStepSize = ((mainWindow->GetSize().GetWidth() - 0) - 0) / (count - i);
+    const int labelStepSize = ((mainWindow->GetSize().GetWidth() - 0) - 0) / (count - start);
 
     //distance
     int labelDistance = INT_MAX - labelStepSize;
@@ -281,7 +305,7 @@ void PanelSensor::UpdateChart(){
     last_time.tm_wday = 0;   // Days since Sunday [0, 6] (computed automatically)
     last_time.tm_yday = 0;   // Days since Jan 1 [0, 365] (computed automatically)
     last_time.tm_isdst = -1; // Let the system determine daylight saving time;
-    for(; i < count; i++){
+    for(size_t i = start; i < count; i++){
         //get point
         x = JSON_ParseString(data["values"][i], "date");
         y = JSON_ParseNumber(data["values"][i], "value");
@@ -341,6 +365,21 @@ void PanelSensor::UpdateChart(){
         //remember date
         if(x.length() > 0)
             last_time = time;
+    }
+
+    //Standard deviation
+    if(chartLocalValidCount){
+        float avg = chartLocalSum / (float)chartLocalValidCount;
+        chartLocalStandardDeviationSum = 0;
+        for(size_t i = start; i < count; i++){
+            //check value
+            if(!JSON_isNumber(data["values"][i], "value"))
+                continue;
+            //parse
+            y = JSON_ParseNumber(data["values"][i], "value");
+            //add to d_sum
+            chartLocalStandardDeviationSum += (float)pow((double)(y - avg), (double)(2));
+        }
     }
     
     //labels

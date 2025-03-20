@@ -52,12 +52,14 @@ class PanelSensor : public Panel{
     float chartSum;
     size_t chartMinIndex = 0;
     size_t chartMaxIndex = 0;
+    float chartStandardDeviationSum;
 
     //current chart info
     int chartLocalValidCount;
     float chartLocalSum;
     size_t chartLocalMinIndex = 0;
     size_t chartLocalMaxIndex = 0;
+    float chartLocalStandardDeviationSum;
 
     //Button Back
     wxButton* button_back;
