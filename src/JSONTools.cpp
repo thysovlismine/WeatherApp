@@ -3,6 +3,7 @@
 #include <unordered_set>
 #include <fstream>
 #include <sstream>
+#include <filesystem>
 
 float JSON_ParseNumber(const nlohmann::json& item) {
     try{
@@ -84,6 +85,14 @@ bool JSON_FromFile(nlohmann::json& data, std::string targetFile){
 
 bool JSON_ToFile(nlohmann::json& data, std::string targetFile){
     try{
+        //make directories
+        //ChatGPT
+        std::filesystem::path dirPath = std::filesystem::path(targetFile).parent_path(); // Extract directory from the full path
+        if (!dirPath.empty() && !std::filesystem::exists(dirPath)) {
+            if (!std::filesystem::create_directories(dirPath)) {
+                return false;
+            }
+        }
         //save present to file
         std::ofstream outFile(targetFile);
         outFile << data.dump(4);

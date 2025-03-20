@@ -5,6 +5,18 @@
 #include <algorithm>
 #include <iomanip>
 
+std::string GetPathIndex(){
+    return "db/index.json";
+}
+
+std::string GetPathStation(const std::string& stationId){
+    return "db/station_" + stationId + ".json";
+}
+
+std::string GetPathSensor(const std::string& sensorId){
+    return "db/sensor_" + sensorId + ".json";
+}
+
 //ChatGPT
 void JSON_SortByDate(nlohmann::json& arr){
     //ChatGPT
@@ -86,16 +98,16 @@ void UpdateGeneral(std::string data, std::string targetFile, std::string uniqueK
 }
 
 void LocalDB::UpdateIndex(std::string data){
-    UpdateGeneral(data, "index.json", "id");
+    UpdateGeneral(data, GetPathIndex(), "id");
 }
 
 void LocalDB::UpdateStation(std::string stationId, std::string data){
-    UpdateGeneral(data, "station_" + stationId + ".json", "id");
+    UpdateGeneral(data, GetPathStation(stationId), "id");
 }
 
 void LocalDB::UpdateSensor(std::string sensorId, std::string data){
     //target file
-    std::string targetFile = "sensor_" + sensorId + ".json";
+    std::string targetFile = GetPathSensor(sensorId);
     
     //block empty updates
     if(EmptyResponseCheck(data))
@@ -158,13 +170,13 @@ void LocalDB::UpdateSensor(std::string sensorId, std::string data){
 
 
 bool LocalDB::LoadIndex(nlohmann::json& data){
-    return JSON_FromFile(data, "index.json");
+    return JSON_FromFile(data, GetPathIndex());
 }
 
 bool LocalDB::LoadStation(nlohmann::json& data, std::string stationId){
-    return JSON_FromFile(data, "station_" + stationId + ".json");
+    return JSON_FromFile(data, GetPathStation(stationId));
 }
 
 bool LocalDB::LoadSensor(nlohmann::json& data, std::string sensorId){
-    return JSON_FromFile(data, "sensor_" + sensorId + ".json");
+    return JSON_FromFile(data, GetPathSensor(sensorId));
 }
