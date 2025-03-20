@@ -16,6 +16,10 @@ class PanelSensor : public Panel{
     //context
     std::string sensorId;
     
+    //style config
+    const int styleObjectSpacingX = 10;
+    const int styleObjectSpacingY = 10;
+
     //funcs
     void FetchData();
     HttpFetcher* httpFetcher = nullptr;

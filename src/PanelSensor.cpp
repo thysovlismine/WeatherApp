@@ -16,11 +16,11 @@ PanelSensor::PanelSensor(Panel* origin, std::string _sensorId) : Panel(origin){
     mainWindow->Bind(wxEVT_FULLSCREEN, &PanelSensor::OnFullScreen, this);
 
     //Button Back
-    button_back = new wxButton(panel, wxID_ANY, "<--", wxPoint(10, 10), wxSize(100, 40));
+    button_back = new wxButton(panel, wxID_ANY, "<--", wxPoint(styleObjectSpacingX, styleObjectSpacingY), wxSize(100, 40));
     button_back->Bind(wxEVT_BUTTON, &PanelSensor::ButtonBack_OnButtonClick, this);
     
     //Slider
-    slider = new wxSlider(panel, wxID_ANY, (PanelSensor::sliderMaxValue + PanelSensor::sliderMinValue) / 2, PanelSensor::sliderMinValue, PanelSensor::sliderMaxValue, wxPoint(120, 10), wxSize(300, -1), wxSL_HORIZONTAL);
+    slider = new wxSlider(panel, wxID_ANY, (PanelSensor::sliderMaxValue + PanelSensor::sliderMinValue) / 2, PanelSensor::sliderMinValue, PanelSensor::sliderMaxValue, wxPoint(styleObjectSpacingX + 100 + styleObjectSpacingX, styleObjectSpacingY), wxSize(300, -1), wxSL_HORIZONTAL);
     slider->Bind(wxEVT_SLIDER, &PanelSensor::OnSliderChanged, this);
 
     //summery 1
@@ -230,23 +230,23 @@ void PanelSensor::UpdateSummery1Text(){
 
 void PanelSensor::UpdateSummeryTransofrm(){
     //get screen szie
-    wxSize screenSize = mainWindow->GetSize();
+    wxSize screenSize = mainWindow->GetClientSize();
 
     //summery 1
-    summery1->SetPosition(wxPoint(10, screenSize.GetHeight() - 200 - 10));
-    summery1->SetSize((screenSize.GetWidth() - 10) / 2 - 5, 200);
+    summery1->SetPosition(wxPoint(styleObjectSpacingX, screenSize.GetHeight() - styleObjectSpacingY - 200));
+    summery1->SetSize((screenSize.GetWidth() - 2 * styleObjectSpacingX) / 2 - styleObjectSpacingX / 2, 200);
 
     //summery 2
-    summery2->SetPosition(wxPoint(summery1->GetPosition().x + summery1->GetSize().GetWidth() + 10, summery1->GetPosition().y));
+    summery2->SetPosition(wxPoint(summery1->GetPosition().x + summery1->GetSize().GetWidth() + styleObjectSpacingX, summery1->GetPosition().y));
     summery2->SetSize(summery1->GetSize());
 }
 
 //================================================================
 
 void PanelSensor::UpdateChartSize(){
-    wxSize newSize = mainWindow->GetSize();
-    newSize.SetWidth(newSize.GetWidth() - 10);
-    newSize.SetHeight(summery1->GetPosition().y - chart->GetPosition().y - 10);
+    wxSize newSize = mainWindow->GetClientSize();
+    newSize.SetWidth(newSize.GetWidth() - 2 * styleObjectSpacingX);
+    newSize.SetHeight(summery1->GetPosition().y - chart->GetPosition().y - styleObjectSpacingY);
     chart->SetSize(newSize);
 }
 
@@ -403,7 +403,7 @@ void PanelSensor::UpdateChart(){
     options.GetCommonOptions().SetShowTooltips(false);
     //options.GetGridOptions().SetShowGridLines(false);
     //
-    chart = new wxLineChartCtrl(panel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, options, wxPoint(10, 60), wxSize(100, 100), wxBORDER_NONE);
+    chart = new wxLineChartCtrl(panel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, options, wxPoint(styleObjectSpacingX, std::max(button_back->GetPosition().y + + button_back->GetSize().GetHeight(), slider->GetPosition().y + slider->GetSize().GetHeight()) + styleObjectSpacingY), wxSize(100, 100), wxBORDER_NONE);
     UpdateChartSize();
 
     //update richText
