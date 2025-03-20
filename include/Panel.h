@@ -11,7 +11,7 @@ class Panel{
     Panel(Panel* origin);   //hides the origin panel and displays only this panel
     ~Panel();           //deletes this panel and uses the origin panel to be displayed back again.
 
-    void Panel::SetTitle(std::string title);
+    void SetTitle(std::string title);
     
     private:
     Panel* _origin;
