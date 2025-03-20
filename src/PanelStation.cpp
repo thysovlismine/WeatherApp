@@ -8,6 +8,9 @@ PanelStation::PanelStation(Panel* origin, std::string _stationId) : Panel(origin
     //context
     stationId = _stationId;
 
+    //window
+    SetTitle("Stacja " + stationId);
+
     //Text top
     textTop = new wxStaticText(panel, wxID_ANY, "Wybierz Stacje Pomiarowa", wxPoint(10, 10));
 

@@ -10,6 +10,9 @@ PanelSensor::PanelSensor(Panel* origin, std::string _sensorId) : Panel(origin){
     //context
     sensorId = _sensorId;
 
+    //window
+    SetTitle("Sensor " + sensorId);
+
     //window event
     mainWindow->Bind(wxEVT_SIZE, &PanelSensor::OnWindowResized, this);
     mainWindow->Bind(wxEVT_MAXIMIZE, &PanelSensor::OnWindowMaximized, this);

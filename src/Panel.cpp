@@ -23,8 +23,18 @@ Panel::~Panel(){
     panel = nullptr;
     
     //show the previous panel (if this is not the main one)
-    if(_origin != nullptr)
+    if(_origin != nullptr){
         _origin->panel->Show();
+        _origin->SetTitle(_origin->_title);
+    }
     
     mainWindow->Layout();  // Update layout
+}
+
+void Panel::SetTitle(std::string title){
+    //remember title
+    _title = title;
+    //update title
+    if(panel->IsShown())
+        dynamic_cast<wxFrame*>(mainWindow)->SetTitle(_title);
 }

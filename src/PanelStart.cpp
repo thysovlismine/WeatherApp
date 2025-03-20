@@ -6,6 +6,9 @@
 //================================================================
 
 PanelStart::PanelStart() : Panel(nullptr), httpFetcher(nullptr){
+    //window
+    SetTitle("Lista Stacji");
+
     //Text top
     textTop = new wxStaticText(panel, wxID_ANY, "Wybierz Stacje Pomiarowa", wxPoint(10, 10));
 
