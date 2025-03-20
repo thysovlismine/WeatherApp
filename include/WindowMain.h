@@ -5,7 +5,6 @@
 
 #include <wx/wx.h>
 #include "Panel.h"
-#include "PanelStart.h"
 
 class WindowMain : public wxFrame {
     public:
