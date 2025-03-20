@@ -4,7 +4,7 @@ project(app)
 set(CMAKE_CXX_STANDARD 17)
 
 # Find wxWidgets and cpr
-find_package(wxWidgets REQUIRED richtext )
+find_package(wxWidgets REQUIRED richtext html xml)
 find_package(cpr CONFIG REQUIRED)
 
 # Find wxCharts (installed via vcpkg)
