@@ -26,8 +26,9 @@ PanelStation::PanelStation(Panel* origin, std::string _stationId, std::string _s
     
 
     //fetch info
-    FetchParams();
     panel->Bind(EVT_HTTP_FETCH_COMPLETE, &PanelStation::OnDataFetched, this);
+    FetchParams();
+    
 }
 
 PanelStation::~PanelStation(){
@@ -67,15 +68,8 @@ void PanelStation::OnDataFetched(wxThreadEvent& event){
     //get response
     std::string response = event.GetPayload<std::string>();
 
-    //check error
-    if(response.length() == 0){
-        wxMessageBox("Failed to fetch data!", "Error", wxICON_ERROR | wxOK);
-        return;
-    }
-    else{
-        //update DB
-        LocalDB::UpdateStation(stationId, response);
-    }
+    //update DB
+    LocalDB::UpdateStation(stationId, response);
 
     //clear list
     listSensors->Clear();

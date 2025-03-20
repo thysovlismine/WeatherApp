@@ -25,11 +25,23 @@ void JSON_SortByDate(nlohmann::json& arr){
     );
 }
 
+bool EmptyResponseCheck(std::string& data){
+    if(data.length() == 0){
+        wxMessageBox(wxString::FromUTF8("Nie udało się uzyskać nowych danych.\nUżywanie danych wcześniej zapisanych."), "Offline", wxICON_INFORMATION | wxOK);
+        return true;
+    }
+    return false;
+}
+
 void UpdateGeneral(std::string data, std::string targetFile, std::string uniqueKeyName){
     //parse json
     nlohmann::json fetched;
     nlohmann::json present;
     
+    //block empty updates
+    if(EmptyResponseCheck(data))
+        return;
+
     //prepare jsons
     try{
         //parse fetched data
@@ -85,6 +97,10 @@ void LocalDB::UpdateSensor(std::string sensorId, std::string data){
     //target file
     std::string targetFile = "sensor_" + sensorId + ".json";
     
+    //block empty updates
+    if(EmptyResponseCheck(data))
+        return;
+
     //parse json
     nlohmann::json fetched;
     nlohmann::json present;
