@@ -23,11 +23,18 @@ PanelSensor::PanelSensor(Panel* origin, std::string _sensorId) : Panel(origin){
     slider = new wxSlider(panel, wxID_ANY, (PanelSensor::sliderMaxValue + PanelSensor::sliderMinValue) / 2, PanelSensor::sliderMinValue, PanelSensor::sliderMaxValue, wxPoint(120, 10), wxSize(300, -1), wxSL_HORIZONTAL);
     slider->Bind(wxEVT_SLIDER, &PanelSensor::OnSliderChanged, this);
 
-    //rich text
-    richText = new wxRichTextCtrl(panel, wxID_ANY, "", wxPoint(10, 60), wxSize(512, 512), wxRE_MULTILINE | wxVSCROLL);
-    richText->Clear();
-    richText->SetEditable(false);
-    UpdateRichTextTransofrm();
+    //summery 1
+    summery1 = new wxRichTextCtrl(panel, wxID_ANY, "", wxPoint(10, 60), wxSize(512, 512), wxRE_MULTILINE | wxVSCROLL);
+    summery1->Clear();
+    summery1->SetEditable(false);
+    
+    //summery 2
+    summery2 = new wxRichTextCtrl(panel, wxID_ANY, "", wxPoint(522, 60), wxSize(512, 512), wxRE_MULTILINE | wxVSCROLL);
+    summery2->Clear();
+    summery2->SetEditable(false);
+    
+    //update transform of summeries
+    UpdateSummeryTransofrm();
 
     //fetch data
     panel->Bind(EVT_HTTP_FETCH_COMPLETE, &PanelSensor::OnDataFetched, this);
@@ -35,10 +42,16 @@ PanelSensor::PanelSensor(Panel* origin, std::string _sensorId) : Panel(origin){
 }
 
 PanelSensor::~PanelSensor(){
+    //Unbind window events (to avoid operation on null)
+    mainWindow->Unbind(wxEVT_SIZE, &PanelSensor::OnWindowResized, this);
+    mainWindow->Unbind(wxEVT_MAXIMIZE, &PanelSensor::OnWindowMaximized, this);
+    mainWindow->Unbind(wxEVT_FULLSCREEN, &PanelSensor::OnFullScreen, this);
+
     //destroy objects by pointers
     button_back->Destroy(); button_back = nullptr;
     slider->Destroy(); slider = nullptr;
-    richText->Destroy(); richText = nullptr;
+    summery1->Destroy(); summery1 = nullptr;
+    summery2->Destroy(); summery2 = nullptr;
 
     //chart
     if(chart != nullptr){
@@ -56,7 +69,7 @@ PanelSensor::~PanelSensor(){
 
 void PanelSensor::UpdateGUI(){
     UpdateChart();
-    UpdateRichTextTransofrm();
+    UpdateSummeryTransofrm();
     mainWindow->Layout();
 }
 
@@ -143,6 +156,21 @@ void PanelSensor::OnDataFetched(wxThreadEvent& event){
             //count
             chartValidCount++;
         }
+
+        //update summary2
+        std::string message = "";
+        //whole chart
+        message += "\tCały okres";
+        message += "\nLiczba: " + std::to_string(chartValidCount);
+        message += "\nSuma: " + std::to_string(chartSum);
+        message += "\nSrednia: " + std::to_string(chartSum / (float)chartValidCount);
+        if(chartMinIndex)
+            message += "\nMinimum: " + JSON_ParseAsString(data["values"][chartMinIndex - 1], "value") + " dla " + JSON_ParseAsString(data["values"][chartMinIndex - 1], "date");
+        if(chartMaxIndex)
+            message += "\nMaximum: " + JSON_ParseAsString(data["values"][chartMaxIndex - 1], "value") + " dla " + JSON_ParseAsString(data["values"][chartMaxIndex - 1], "date");
+        //write
+        summery2->Clear();
+        summery2->WriteText(wxString::FromUTF8(message));
     }
 
     //Update chart
@@ -157,8 +185,8 @@ void PanelSensor::OnSliderChanged(wxCommandEvent& event){
 
 //================================================================
 
-void PanelSensor::UpdateRichTextText(){
-    //write message
+void PanelSensor::UpdateSummery1Text(){
+    //message
     std::string message = "";
 
     //local chart
@@ -171,42 +199,30 @@ void PanelSensor::UpdateRichTextText(){
     if(chartLocalMaxIndex)
         message += "\nMaximum: " + JSON_ParseAsString(data["values"][chartLocalMaxIndex - 1], "value") + " dla " + JSON_ParseAsString(data["values"][chartLocalMaxIndex - 1], "date");
 
-    //space
-    message += "\n\n";
-
-    //whole chart
-    message += "\tCały okres";
-    message += "\nLiczba: " + std::to_string(chartValidCount);
-    message += "\nSuma: " + std::to_string(chartSum);
-    message += "\nSrednia: " + std::to_string(chartSum / (float)chartValidCount);
-    if(chartMinIndex)
-        message += "\nMinimum: " + JSON_ParseAsString(data["values"][chartMinIndex - 1], "value") + " dla " + JSON_ParseAsString(data["values"][chartMinIndex - 1], "date");
-    if(chartMaxIndex)
-        message += "\nMaximum: " + JSON_ParseAsString(data["values"][chartMaxIndex - 1], "value") + " dla " + JSON_ParseAsString(data["values"][chartMaxIndex - 1], "date");
-    
     //write
-    richText->Clear();
-    richText->WriteText(wxString::FromUTF8(message));
+    summery1->Clear();
+    summery1->WriteText(wxString::FromUTF8(message));
 }
 
-void PanelSensor::UpdateRichTextTransofrm(){
-    wxSize newSize = panel->GetClientSize();
+void PanelSensor::UpdateSummeryTransofrm(){
+    //get screen szie
+    wxSize screenSize = mainWindow->GetSize();
 
-    //position
-    richText->SetPosition(wxPoint(10, newSize.GetHeight() - 200 - 10));
+    //summery 1
+    summery1->SetPosition(wxPoint(10, screenSize.GetHeight() - 200 - 10));
+    summery1->SetSize((screenSize.GetWidth() - 10) / 2 - 5, 200);
 
-    //size
-    newSize.SetWidth(newSize.GetWidth() - 10);
-    newSize.SetHeight(200);
-    richText->SetSize(newSize);
+    //summery 2
+    summery2->SetPosition(wxPoint(summery1->GetPosition().x + summery1->GetSize().GetWidth() + 10, summery1->GetPosition().y));
+    summery2->SetSize(summery1->GetSize());
 }
 
 //================================================================
 
 void PanelSensor::UpdateChartSize(){
-    wxSize newSize = panel->GetClientSize();
+    wxSize newSize = mainWindow->GetSize();
     newSize.SetWidth(newSize.GetWidth() - 10);
-    newSize.SetHeight(richText->GetPosition().y - chart->GetPosition().y - 10);
+    newSize.SetHeight(summery1->GetPosition().y - chart->GetPosition().y - 10);
     chart->SetSize(newSize);
 }
 
@@ -352,7 +368,7 @@ void PanelSensor::UpdateChart(){
     UpdateChartSize();
 
     //update richText
-    UpdateRichTextText();
+    UpdateSummery1Text();
 }
 
 //================================================================

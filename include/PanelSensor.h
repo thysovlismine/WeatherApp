@@ -36,9 +36,10 @@ class PanelSensor : public Panel{
     const int startingValueCount = 24;
 
     //info stats
-    wxRichTextCtrl* richText;
-    void UpdateRichTextText();
-    void UpdateRichTextTransofrm();
+    wxRichTextCtrl* summery1;
+    wxRichTextCtrl* summery2;
+    void UpdateSummery1Text();
+    void UpdateSummeryTransofrm();
 
     //chart
     nlohmann::json data;
