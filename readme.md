@@ -1,5 +1,10 @@
+# Weather App
 
-# Requirements
+This is an Application that I had to make for college. The app uses the available [GIOS API](https://powietrze.gios.gov.pl/pjp/content/api) to fetch the data about stations in Poland and their sensors that measure some weird stuff. The app can list all of the stations, their sensors, and specific sensor data presented in a chart. All fetched data is stored in a local JSON database which supports the app with already saved data so that the user can still view data but offline.
+
+## Requirements
+
+Using [vcpkg](https://vcpkg.io/) install:
 
 ```
 vcpkg install nlohmann-json
@@ -8,43 +13,22 @@ vcpkg install wxwidgets
 vcpkg install wxcharts
 ```
 
-# Compiling
+## Compiling
 
-Replace `@@@VCPKPG_CMAKE_PATH_HERE@@@` with the path to the VCPKG cmake file which can be checked via `vcpkg integrate install`.
+Tested on Windows and Ubuntu.
+
+**Replace `@@@VCPKPG_CMAKE_PATH_HERE@@@` with the path to the VCPKG cmake file which can be checked via `vcpkg integrate install`.**
 ```
 mkdir build
 cd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE=@@@VCPKPG_CMAKE_PATH_HERE@@@
-cmake --build .
+cmake .. -DCMAKE_TOOLCHAIN_FILE=@@@VCPKPG_CMAKE_PATH_HERE@@@ -DCMAKE_BUILD_TYPE=Release
+cmake --build . --config Release
 ```
 
-# Plan Kodu
+The App should be in `build/Release`.
 
-- `WindowMain` - Wybór stacji Pomiarowej.
-- `?` - Odczyt parametru danej stacji pomiarowej.
+## TODO:
 
-# Noticed Errors:
-
-- There is a problem when you make a fetch to a wrongly written url
-- LineChart seem to also allow to see values in the points that are between values or weirdly around... leading to a unreadable chart when mouse hovers on it.
-- JSON values should be parsed via a try/catch method cause reading an int for example from a null value will cause an error (thus may stop a part of a code or a whole).
-- App crashes when there is no internet
-
-# Strategy / Approach
-
-- `HttpRequest` should be called by a `Panel` and not by the DBMS. To be clear, DBMS could acctually handle every async thing, but then would come a question of when to update things. So let a `Panel` be the initiator which recieves the response from the server, and gives it to the DBMS to parse it and include in its DB. 
-
-
-# Plan DB
-
-```
-DB structure:
-
-----DB
-    |
-    |---index.json                  //Info o stacjach
-    |
-    |---station_$stationId$.json    //Info o sensorach danej stacji
-    |
-    |---sensor_$stationId$.json     //Dane dotyczące danego sensora, danej konkretnej stacji (stationId is unikatowy)
-```
+- "indeks jakości powietrza"
+- Doxygen
+- Unit testing
