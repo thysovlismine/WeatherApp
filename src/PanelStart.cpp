@@ -103,7 +103,8 @@ void PanelStart::ListStations_OnItemDoubleClicked(wxCommandEvent& event){
     int index = listStations->GetSelection();
     if (index != wxNOT_FOUND) {
         std::string id = JSON_ParseAsString(data[index], "id");
-        new PanelStation(this, id);
+        std::string name = JSON_ParseString(data[index], "stationName");
+        new PanelStation(this, id, name);
     }
 }
 

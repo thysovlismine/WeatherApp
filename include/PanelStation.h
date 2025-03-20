@@ -5,12 +5,17 @@
 
 class PanelStation : public Panel{
     public:
-    PanelStation(Panel* origin, std::string stationId);
+    PanelStation(Panel* origin, std::string stationId, std::string stationName);
     ~PanelStation();
 
     //context
     std::string stationId;
+    std::string stationName;
     
+    //style config
+    const int styleObjectSpacingX = 10;
+    const int styleObjectSpacingY = 10;
+
     //funcs
     void FetchParams();
     HttpFetcher* httpFetcher = nullptr;

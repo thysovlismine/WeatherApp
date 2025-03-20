@@ -36,5 +36,5 @@ void Panel::SetTitle(std::string title){
     _title = title;
     //update title
     if(panel->IsShown())
-        dynamic_cast<wxFrame*>(mainWindow)->SetTitle(_title);
+        dynamic_cast<wxFrame*>(mainWindow)->SetTitle(wxString::FromUTF8(_title));
 }

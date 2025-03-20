@@ -6,12 +6,13 @@
 
 //================================================================
 
-PanelSensor::PanelSensor(Panel* origin, std::string _sensorId) : Panel(origin){
+PanelSensor::PanelSensor(Panel* origin, std::string _sensorId, std::string _chartName) : Panel(origin){
     //context
     sensorId = _sensorId;
+    chartName = _chartName;
 
     //window
-    SetTitle("Sensor " + sensorId);
+    SetTitle("Sensor: " + chartName);
 
     //window event
     mainWindow->Bind(wxEVT_SIZE, &PanelSensor::OnWindowResized, this);
@@ -234,10 +235,11 @@ void PanelSensor::UpdateSummery1Text(){
 void PanelSensor::UpdateSummeryTransofrm(){
     //get screen szie
     wxSize screenSize = mainWindow->GetClientSize();
+    const int h = 160;
 
     //summery 1
-    summery1->SetPosition(wxPoint(styleObjectSpacingX, screenSize.GetHeight() - styleObjectSpacingY - 200));
-    summery1->SetSize((screenSize.GetWidth() - 2 * styleObjectSpacingX) / 2 - styleObjectSpacingX / 2, 200);
+    summery1->SetPosition(wxPoint(styleObjectSpacingX, screenSize.GetHeight() - styleObjectSpacingY - h));
+    summery1->SetSize((screenSize.GetWidth() - 2 * styleObjectSpacingX) / 2 - styleObjectSpacingX / 2, h);
 
     //summery 2
     summery2->SetPosition(wxPoint(summery1->GetPosition().x + summery1->GetSize().GetWidth() + styleObjectSpacingX, summery1->GetPosition().y));

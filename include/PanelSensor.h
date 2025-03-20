@@ -10,11 +10,12 @@
 
 class PanelSensor : public Panel{
     public:
-    PanelSensor(Panel* origin, std::string sensorId);
+    PanelSensor(Panel* origin, std::string sensorId, std::string chartName);
     ~PanelSensor();
 
     //context
     std::string sensorId;
+    std::string chartName;
     
     //style config
     const int styleObjectSpacingX = 10;
