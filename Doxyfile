@@ -2971,7 +2971,7 @@ MSCFILE_DIRS           =
 
 
 
-
+PROJECT_NAME = "Weather App"
 INPUT = include
 RECURSIVE = YES
 EXTRACT_ALL = YES
