@@ -27,6 +27,16 @@ cmake --build . --config Release
 
 The compiled app should be in `build/Release/app.exe`. On my Ubuntu, it's straight in `build/app`.
 
+## Documentation
+
+Run:
+
+```
+doxygen Doxyfile
+```
+
+Visit `html/index.html`.
+
 ## TODO:
 
 - "indeks jakości powietrza"
