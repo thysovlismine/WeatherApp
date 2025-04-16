@@ -39,6 +39,4 @@ Visit `html/index.html`.
 
 ## TODO:
 
-- "indeks jakości powietrza"
-- Doxygen
 - Unit testing
