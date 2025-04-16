@@ -6,12 +6,10 @@
 #include <filesystem>
 
 float JSON_ParseNumber(const nlohmann::json& item) {
-    try{
+    if (item.is_number()) {
         return item.get<float>();
     }
-    catch(const std::exception&){
-        return 0;
-    }
+    return 0;
 }
 
 float JSON_ParseNumber(const nlohmann::json& item, const std::string keyName) {
@@ -58,10 +56,10 @@ std::string JSON_ParseAsString(const nlohmann::json& item, const std::string key
     try{
         if(item.contains(keyName))
             return item[keyName].dump();
-        return 0;
+        return "";
     }
     catch(const std::exception&){
-        return 0;
+        return "";
     }
 }
 
@@ -108,27 +106,11 @@ bool JSON_ToFile(nlohmann::json& data, std::string targetFile){
 }
 
 bool JSON_isNumber(const nlohmann::json& item){
-    try{
-        float a = item.get<float>();
-    }
-    catch(const std::exception&){
-        return false;
-    }
-    return true;
+    return item.is_number();
 }
 
 bool JSON_isNumber(const nlohmann::json& item, const std::string keyName){
-    try{
-        if(item.contains(keyName)){
-            float a = item[keyName].get<float>();
-        }
-        else
-            return false;
-    }
-    catch(const std::exception&){
-        return false;
-    }
-    return true;
+    return item.contains(keyName) && item[keyName].is_number();
 }
 
 //by ChatGPT
@@ -191,6 +173,17 @@ void JSON_UpdateArray(nlohmann::json& arrPresent, const nlohmann::json& arrNew, 
 //ChatGPT
 bool parseDateTime(const std::string& datetime, std::tm& tm) {
     std::istringstream ss(datetime);
-    ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
-    return !ss.fail(); // Return false if parsing fails
+    if (ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S")) {
+        return true; // Successfully parsed with date and time
+    }
+    // If parsing fails, try parsing just the date part (defaulting time to 00:00:00)
+    ss.clear();
+    ss.str(datetime); // reset the stringstream
+    if (ss >> std::get_time(&tm, "%Y-%m-%d")) {
+        tm.tm_hour = 0;
+        tm.tm_min = 0;
+        tm.tm_sec = 0;
+        return true; // Successfully parsed with date only
+    }
+    return false; // Failed to parse
 }
